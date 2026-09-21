@@ -5,505 +5,1095 @@
 
 <meta name="viewport"
       content="width=device-width,
-      initial-scale=1.0,
-      maximum-scale=1.0,
-      user-scalable=no,
-      viewport-fit=cover">
+               initial-scale=1.0,
+               maximum-scale=1.0,
+               user-scalable=no,
+               viewport-fit=cover">
+
+<meta name="theme-color" content="#72c7ef">
 
 <title>Whispering Garden</title>
 
 <style>
 
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-    user-select:none;
-    -webkit-user-select:none;
-    -webkit-tap-highlight-color:transparent;
+/* =========================================================
+   WHISPERING GARDEN
+   Complete visual rebuild
+   Functionality preserved + new voice objects
+   ========================================================= */
+
+:root {
+    --sky-day:
+        linear-gradient(
+            180deg,
+            #68baf0 0%,
+            #a7dcf7 38%,
+            #d8f1d0 67%,
+            #78c85c 100%
+        );
+
+    --sky-night:
+        linear-gradient(
+            180deg,
+            #071120 0%,
+            #102742 42%,
+            #1b3d4e 70%,
+            #193b29 100%
+        );
+
+    --grass:
+        linear-gradient(
+            180deg,
+            #79d15f 0%,
+            #60bb4e 45%,
+            #449b3d 100%
+        );
+
+    --grass-night:
+        linear-gradient(
+            180deg,
+            #315f36 0%,
+            #244b2c 55%,
+            #173821 100%
+        );
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
 html,
-body{
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    font-family:Arial,sans-serif;
+body {
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    overflow: hidden;
+    font-family:
+        "Trebuchet MS",
+        "Segoe UI",
+        system-ui,
+        sans-serif;
 }
 
-body{
-    touch-action:none;
+body {
+    background: #68baf0;
+    color: #19384c;
+    transition: background 1.4s ease;
 }
 
-/* =====================================================
-   WORLD
-===================================================== */
-
-#world{
-    position:relative;
-    width:100vw;
-    height:100dvh;
-    overflow:hidden;
+#garden-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    overflow: hidden;
+    isolation: isolate;
 
     background:
+        radial-gradient(
+            circle at 15% 15%,
+            rgba(255,255,255,.35),
+            transparent 18%
+        ),
+        radial-gradient(
+            circle at 80% 20%,
+            rgba(255,241,178,.22),
+            transparent 20%
+        ),
+        var(--sky-day);
+
+    transition: background 1.5s ease;
+}
+
+body.night #garden-container {
+    background:
+        radial-gradient(
+            circle at 78% 17%,
+            rgba(150,190,230,.10),
+            transparent 20%
+        ),
+        var(--sky-night);
+}
+
+/* =========================================================
+   ATMOSPHERIC BACKGROUND
+   ========================================================= */
+
+#garden-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+
+    background:
+        radial-gradient(
+            ellipse at 50% 62%,
+            rgba(255,255,255,.15),
+            transparent 42%
+        ),
         linear-gradient(
             to bottom,
-            #8ed9ff 0%,
-            #c7edff 54%,
-            #b4df8e 55%,
-            #7fc56b 100%
+            transparent 0 55%,
+            rgba(35,90,48,.08) 75%,
+            rgba(20,68,35,.16) 100%
         );
 }
 
+/* =========================================================
+   HEADER
+   ========================================================= */
 
-/* =====================================================
+.app-header {
+    position: absolute;
+    z-index: 100;
+
+    top: max(10px, env(safe-area-inset-top));
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: min(92%, 560px);
+
+    padding: 11px 20px 12px;
+
+    text-align: center;
+
+    border-radius: 22px;
+
+    background: rgba(255,255,255,.24);
+
+    border: 1px solid rgba(255,255,255,.48);
+
+    box-shadow:
+        0 10px 35px rgba(30,75,100,.13),
+        inset 0 1px 0 rgba(255,255,255,.5);
+
+    backdrop-filter: blur(13px) saturate(130%);
+    -webkit-backdrop-filter: blur(13px) saturate(130%);
+
+    pointer-events: none;
+}
+
+.app-title {
+    color: #173d55;
+
+    font-size:
+        clamp(1.3rem, 5vw, 2rem);
+
+    font-weight: 800;
+
+    letter-spacing: .7px;
+
+    text-shadow:
+        0 2px 10px rgba(255,255,255,.75);
+}
+
+.app-subtitle {
+    margin-top: 3px;
+
+    color: #28576d;
+
+    font-size:
+        clamp(.72rem, 2.5vw, .95rem);
+
+    font-weight: 600;
+
+    opacity: .9;
+}
+
+body.night .app-header {
+    background: rgba(9,24,40,.42);
+    border-color: rgba(220,240,255,.16);
+}
+
+body.night .app-title,
+body.night .app-subtitle {
+    color: #eaf7ff;
+    text-shadow: 0 2px 10px rgba(0,0,0,.4);
+}
+
+/* =========================================================
    SKY
-===================================================== */
+   ========================================================= */
 
-.sky{
-    position:absolute;
-    inset:0 0 45% 0;
+.sky-zone {
+    position: absolute;
+
+    top: 0;
+    left: 0;
+    right: 0;
+
+    height: 57%;
+
+    z-index: 2;
+
+    pointer-events: none;
+
+    overflow: hidden;
 }
 
-
-/* =====================================================
+/* =========================================================
    SUN
-===================================================== */
+   ========================================================= */
 
-.sun{
-    position:absolute;
+.sun {
+    position: absolute;
 
-    top:7%;
-    right:7%;
+    top: 18%;
+    right: 8%;
 
-    width:clamp(55px,11vw,90px);
-    height:clamp(55px,11vw,90px);
+    width:
+        clamp(62px, 12vw, 100px);
 
-    border-radius:50%;
+    aspect-ratio: 1;
 
-    background:#ffd95c;
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle at 32% 28%,
+            #fffde9 0 8%,
+            #ffe987 25%,
+            #ffc44d 58%,
+            #ef9524 100%
+        );
 
     box-shadow:
-        0 0 25px rgba(255,220,80,.65),
-        0 0 60px rgba(255,220,80,.35);
+        0 0 25px rgba(255,215,100,.8),
+        0 0 65px rgba(255,195,60,.45),
+        0 0 110px rgba(255,220,120,.22);
 
-    z-index:3;
+    transition:
+        opacity 1s ease,
+        transform 1s ease;
 }
 
-.sun.hidden{
-    display:none;
+body.night .sun {
+    opacity: 0;
+    transform: scale(.45);
 }
 
-
-/* =====================================================
+/* =========================================================
    MOON
-===================================================== */
+   ========================================================= */
 
-.moon{
-    position:absolute;
+.moon {
+    position: absolute;
 
-    top:7%;
-    right:8%;
+    top: 18%;
+    right: 8%;
 
-    width:clamp(50px,10vw,82px);
-    height:clamp(50px,10vw,82px);
+    width:
+        clamp(58px, 11vw, 88px);
 
-    border-radius:50%;
+    aspect-ratio: 1;
 
-    background:#fffbdc;
-
-    box-shadow:
-        0 0 30px rgba(255,255,220,.8);
-
-    display:none;
-
-    z-index:3;
-}
-
-.moon.visible{
-    display:block;
-}
-
-
-/* =====================================================
-   BACKGROUND CLOUDS
-===================================================== */
-
-.sky-cloud{
-    position:absolute;
-
-    width:clamp(75px,15vw,135px);
-    height:32px;
-
-    background:white;
-
-    border-radius:30px;
-
-    opacity:.8;
-
-    z-index:1;
-}
-
-.sky-cloud:before,
-.sky-cloud:after{
-    content:"";
-
-    position:absolute;
-
-    background:white;
-
-    border-radius:50%;
-}
-
-.sky-cloud:before{
-    width:42px;
-    height:42px;
-
-    left:18px;
-    top:-20px;
-}
-
-.sky-cloud:after{
-    width:50px;
-    height:50px;
-
-    right:14px;
-    top:-25px;
-}
-
-.bg-cloud-1{
-    top:13%;
-    left:7%;
-}
-
-.bg-cloud-2{
-    top:25%;
-    left:36%;
-    transform:scale(.72);
-}
-
-.bg-cloud-3{
-    top:15%;
-    left:63%;
-    transform:scale(.6);
-}
-
-
-/* =====================================================
-   GROUND
-===================================================== */
-
-.ground{
-    position:absolute;
-
-    left:0;
-    right:0;
-    bottom:0;
-
-    height:46%;
+    border-radius: 50%;
 
     background:
-        linear-gradient(
-            to bottom,
-            #a8dc86,
-            #7fc56b
+        radial-gradient(
+            circle at 34% 30%,
+            #ffffff 0 12%,
+            #edf3f8 45%,
+            #b7c5d2 100%
         );
-
-    z-index:1;
-}
-
-
-/* =====================================================
-   RIVER
-   FIXED CENTER-BOTTOM POSITION
-   HIDDEN INITIALLY
-===================================================== */
-
-#river{
-    position:absolute;
-
-    width:32%;
-    height:30%;
-
-    left:34%;
-    bottom:0;
-
-    background:
-        linear-gradient(
-            to bottom,
-            #67c9ee,
-            #43aeda
-        );
-
-    border-radius:
-        45% 45% 0 0;
 
     box-shadow:
-        inset 0 8px 12px rgba(255,255,255,.25);
+        0 0 25px rgba(240,250,255,.8),
+        0 0 65px rgba(200,225,255,.35);
 
-    opacity:0;
+    opacity: 0;
 
-    transform:scaleY(0);
+    transform: scale(.45);
 
-    transform-origin:bottom;
+    transition:
+        opacity 1s ease,
+        transform 1s ease;
+}
+
+body.night .moon {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* =========================================================
+   STARS
+   ========================================================= */
+
+.stars-container {
+    position: absolute;
+    inset: 0;
+
+    opacity: 0;
+
+    transition: opacity 1.2s ease;
+
+    pointer-events: none;
+}
+
+body.night .stars-container,
+.stars-container.manual-visible {
+    opacity: 1;
+}
+
+.star {
+    position: absolute;
+
+    width: 4px;
+    height: 4px;
+
+    border-radius: 50%;
+
+    background: white;
+
+    box-shadow:
+        0 0 6px white,
+        0 0 12px rgba(255,255,255,.7);
+
+    animation:
+        twinkle 1.8s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle {
+    from {
+        opacity: .3;
+        transform: scale(.65);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1.25);
+    }
+}
+
+/* =========================================================
+   RAINBOW EMOJI
+   ========================================================= */
+
+.rainbow-item {
+    position: absolute;
+
+    left: 50%;
+    top: 30%;
+
+    transform:
+        translate(-50%, -50%)
+        scale(.5);
+
+    font-size:
+        clamp(5rem, 18vw, 10rem);
+
+    line-height: 1;
+
+    opacity: 0;
+
+    filter:
+        drop-shadow(0 8px 8px rgba(40,80,100,.15))
+        drop-shadow(0 0 12px rgba(255,255,255,.3));
 
     transition:
         opacity .8s ease,
-        transform .8s ease;
+        transform .8s cubic-bezier(.34,1.56,.64,1);
 
-    z-index:2;
+    user-select: none;
 }
 
-#river.visible{
-    opacity:1;
-    transform:scaleY(1);
+.rainbow-item.active {
+    opacity: 1;
+
+    transform:
+        translate(-50%, -50%)
+        scale(1);
+
+    animation:
+        rainbowFloat 5s ease-in-out infinite alternate;
 }
 
-
-/* Water lines */
-
-.water{
-    position:absolute;
-
-    left:10%;
-    width:80%;
-
-    height:3px;
-
-    border-radius:50%;
-
-    background:rgba(255,255,255,.5);
-
-    animation:waterMove 3s ease-in-out infinite;
-}
-
-.water-1{
-    top:25%;
-}
-
-.water-2{
-    top:45%;
-    animation-delay:.7s;
-}
-
-.water-3{
-    top:65%;
-    animation-delay:1.2s;
-}
-
-.water-4{
-    top:82%;
-    animation-delay:1.8s;
-}
-
-@keyframes waterMove{
-
-    0%,100%{
-        transform:translateX(-5px);
-        opacity:.35;
+@keyframes rainbowFloat {
+    from {
+        margin-top: 0;
     }
 
-    50%{
-        transform:translateX(5px);
-        opacity:.75;
+    to {
+        margin-top: -7px;
     }
 }
 
+/* =========================================================
+   CLOUDS
+   ========================================================= */
 
-/* =====================================================
-   GARDEN OBJECTS
-===================================================== */
+.cloud-item {
+    position: absolute;
 
-#objects{
-    position:absolute;
-    inset:0;
-
-    z-index:10;
-
-    pointer-events:none;
-}
-
-
-/* =====================================================
-   FLOWERS
-   SIX FIXED POSITIONS
-===================================================== */
-
-.flower{
-    position:absolute;
-
-    font-size:clamp(30px,6vw,50px);
-
-    animation:bloom .55s ease;
-
-    filter:
-        drop-shadow(
-            0 3px 3px rgba(0,0,0,.15)
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,.99),
+            rgba(224,239,246,.9)
         );
+
+    border-radius: 60px;
+
+    opacity: 0;
+
+    transform: scale(.55);
+
+    box-shadow:
+        0 8px 18px rgba(50,90,110,.12),
+        inset 0 2px 3px rgba(255,255,255,.8);
+
+    transition:
+        opacity .7s ease,
+        transform .7s cubic-bezier(.34,1.56,.64,1);
+
+    animation: none;
 }
 
+.cloud-item::before,
+.cloud-item::after {
+    content: "";
 
-/* LEFT GARDEN */
+    position: absolute;
 
-.flower-1{
-    left:5%;
-    bottom:10%;
+    background:
+        linear-gradient(
+            180deg,
+            #ffffff,
+            #e4f0f5
+        );
+
+    border-radius: 50%;
+
+    box-shadow:
+        0 5px 12px rgba(60,90,110,.08);
 }
 
-.flower-2{
-    left:17%;
-    bottom:17%;
+.cloud-item::before {
+    width: 48%;
+    height: 120%;
+
+    left: 13%;
+    bottom: 8%;
 }
 
-.flower-3{
-    left:27%;
-    bottom:8%;
+.cloud-item::after {
+    width: 43%;
+    height: 110%;
+
+    right: 12%;
+    bottom: 5%;
 }
 
+.cloud-item.active {
+    opacity: .96;
+    transform: scale(1);
 
-/* RIGHT GARDEN */
-
-.flower-4{
-    right:27%;
-    bottom:8%;
+    animation:
+        cloudDrift linear infinite;
 }
 
-.flower-5{
-    right:16%;
-    bottom:17%;
-}
-
-.flower-6{
-    right:5%;
-    bottom:10%;
-}
-
-
-@keyframes bloom{
-
-    0%{
-        transform:scale(0);
-        opacity:0;
+@keyframes cloudDrift {
+    from {
+        translate: -150px 0;
     }
 
-    70%{
-        transform:scale(1.15);
-    }
-
-    100%{
-        transform:scale(1);
-        opacity:1;
+    to {
+        translate: calc(100vw + 150px) 0;
     }
 }
 
+/* =========================================================
+   BIRDS
+   ========================================================= */
 
-/* =====================================================
+.bird-item {
+    position: absolute;
+
+    width: 34px;
+    height: 22px;
+
+    opacity: 0;
+
+    transform: scale(.5);
+
+    transition: opacity .5s ease;
+}
+
+.bird-item.active {
+    opacity: 1;
+
+    animation:
+        birdFly 15s linear infinite;
+}
+
+.bird-wing {
+    position: absolute;
+
+    width: 17px;
+    height: 10px;
+
+    border-top:
+        3px solid #23384a;
+
+    border-radius:
+        50% 50% 0 0;
+
+    animation:
+        wingFlap .35s ease-in-out infinite alternate;
+}
+
+.bird-wing::after {
+    content: "";
+
+    position: absolute;
+
+    width: 17px;
+    height: 10px;
+
+    left: 14px;
+    top: -3px;
+
+    border-top:
+        3px solid #23384a;
+
+    border-radius:
+        50% 50% 0 0;
+}
+
+body.night .bird-wing,
+body.night .bird-wing::after {
+    border-color: #dbeafe;
+}
+
+@keyframes wingFlap {
+    from {
+        transform: rotate(-20deg);
+    }
+
+    to {
+        transform: rotate(30deg);
+    }
+}
+
+@keyframes birdFly {
+    0% {
+        transform:
+            translate(-60px, 0)
+            scale(.8);
+    }
+
+    50% {
+        transform:
+            translate(50vw, -25px)
+            scale(1);
+    }
+
+    100% {
+        transform:
+            translate(calc(100vw + 60px), 15px)
+            scale(.8);
+    }
+}
+
+/* =========================================================
+   MIDDLE GARDEN
+   ========================================================= */
+
+.middle-zone {
+    position: absolute;
+
+    top: 36%;
+    left: 0;
+    right: 0;
+
+    height: 34%;
+
+    z-index: 5;
+
+    pointer-events: none;
+}
+
+/* =========================================================
    TREES
-   FOUR FIXED POSITIONS
-===================================================== */
+   ========================================================= */
 
-.tree{
-    position:absolute;
+.tree-item {
+    position: absolute;
 
-    font-size:clamp(50px,10vw,90px);
+    bottom: 5px;
+
+    width:
+        clamp(70px, 13vw, 110px);
+
+    height:
+        clamp(105px, 20vw, 155px);
+
+    opacity: 0;
+
+    transform: scale(.3);
+
+    transition:
+        opacity .7s ease,
+        transform .8s cubic-bezier(.34,1.56,.64,1);
 
     filter:
         drop-shadow(
-            0 5px 4px rgba(0,0,0,.15)
+            0 9px 8px rgba(25,65,35,.25)
+        );
+}
+
+.tree-item.active {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.trunk {
+    position: absolute;
+
+    bottom: 0;
+    left: 50%;
+
+    width: 20px;
+    height: 50%;
+
+    transform: translateX(-50%);
+
+    border-radius: 7px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #583719,
+            #996637 45%,
+            #633c1d
         );
 
-    animation:treeAppear .6s ease;
+    box-shadow:
+        inset 2px 0 rgba(255,255,255,.14);
 }
 
+.leaves {
+    position: absolute;
 
-/* FAR LEFT */
+    top: 0;
+    left: 0;
+    right: 0;
 
-.tree-1{
-    left:2%;
-    bottom:29%;
+    height: 68%;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle at 30% 25%,
+            #78d45e 0 12%,
+            transparent 13%
+        ),
+        radial-gradient(
+            circle at 67% 23%,
+            #62c952 0 14%,
+            transparent 15%
+        ),
+        radial-gradient(
+            circle at 45% 58%,
+            #46aa43 0 32%,
+            #2d8138 78%
+        );
+
+    box-shadow:
+        inset -12px -14px 18px rgba(20,83,34,.2),
+        inset 8px 7px 12px rgba(255,255,255,.12),
+        0 9px 15px rgba(21,74,33,.18);
 }
 
-
-/* LEFT MIDDLE */
-
-.tree-2{
-    left:17%;
-    bottom:32%;
+body.night .leaves {
+    filter: brightness(.65);
 }
 
-
-/* RIGHT MIDDLE */
-
-.tree-3{
-    right:17%;
-    bottom:32%;
-}
-
-
-/* FAR RIGHT */
-
-.tree-4{
-    right:2%;
-    bottom:29%;
-}
-
-
-@keyframes treeAppear{
-
-    from{
-        opacity:0;
-        transform:scale(.7);
-    }
-
-    to{
-        opacity:1;
-        transform:scale(1);
-    }
-}
-
-
-/* =====================================================
+/* =========================================================
    HOUSE
-   FIXED TOP OF GRASS
-   NEVER ON RIVER
-===================================================== */
+   ========================================================= */
 
-.house{
-    position:absolute;
+.house {
+    position: absolute;
 
-    left:50%;
-    bottom:31%;
+    left: 50%;
+    bottom: 10px;
 
-    transform:translateX(-50%);
+    width:
+        clamp(110px, 21vw, 155px);
 
-    width:clamp(100px,18vw,160px);
-    height:clamp(75px,13vw,115px);
+    height:
+        clamp(100px, 19vw, 140px);
 
-    background:#f3c37b;
+    transform:
+        translateX(-50%)
+        scale(.3);
 
-    border:
-        4px solid #a96d43;
+    opacity: 0;
 
-    border-radius:7px;
+    transition:
+        opacity .8s ease,
+        transform .8s cubic-bezier(.34,1.56,.64,1);
 
-    animation:houseAppear .6s ease;
+    filter:
+        drop-shadow(
+            0 12px 12px rgba(35,54,38,.25)
+        );
 }
 
+.house.active {
+    opacity: 1;
 
-/* ROOF */
+    transform:
+        translateX(-50%)
+        scale(1);
+}
 
-.house:before{
-    content:"";
+.house-body {
+    position: absolute;
 
-    position:absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
 
-    left:-16%;
-    top:-48%;
+    height: 65%;
 
-    width:132%;
-    height:70%;
+    border-radius: 7px;
 
-    background:#c65c50;
+    background:
+        linear-gradient(
+            90deg,
+            #eee5d4,
+            #fffaf0 45%,
+            #e4d8c5
+        );
+
+    border: 1px solid rgba(100,70,40,.15);
+
+    box-shadow:
+        0 8px 18px rgba(40,45,35,.18),
+        inset 0 1px rgba(255,255,255,.8);
+}
+
+.house-roof {
+    position: absolute;
+
+    z-index: 2;
+
+    top: 0;
+    left: -11px;
+    right: -11px;
+
+    height: 45%;
+
+    background:
+        linear-gradient(
+            145deg,
+            #a92e2a,
+            #e3523c 50%,
+            #9d2927
+        );
+
+    clip-path:
+        polygon(
+            50% 0%,
+            0% 100%,
+            100% 100%
+        );
+
+    filter:
+        drop-shadow(
+            0 5px 5px rgba(55,30,25,.25)
+        );
+}
+
+.house-door {
+    position: absolute;
+
+    bottom: 0;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    width: 27px;
+    height: 44px;
+
+    border-radius:
+        14px 14px 0 0;
+
+    background:
+        linear-gradient(
+            90deg,
+            #563217,
+            #895229 50%,
+            #573217
+        );
+
+    box-shadow:
+        inset 2px 0 rgba(255,255,255,.13);
+}
+
+.house-window {
+    position: absolute;
+
+    top: 25px;
+
+    width: 27px;
+    height: 27px;
+
+    border: 3px solid #fff8eb;
+
+    border-radius: 5px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #c7f5ff,
+            #69c8e7 55%,
+            #3d91af
+        );
+
+    box-shadow:
+        inset 0 0 7px rgba(255,255,255,.7),
+        0 3px 6px rgba(40,65,75,.18);
+}
+
+.house-window.left {
+    left: 18px;
+}
+
+.house-window.right {
+    right: 18px;
+}
+
+/* =========================================================
+   ANIMALS + PEOPLE
+   ========================================================= */
+
+.creature {
+    position: absolute;
+
+    opacity: 0;
+
+    transform:
+        translateY(12px)
+        scale(.5);
+
+    transition:
+        opacity .6s ease,
+        transform .6s cubic-bezier(.34,1.56,.64,1);
+
+    user-select: none;
+
+    filter:
+        drop-shadow(
+            0 6px 6px rgba(35,50,40,.22)
+        );
+}
+
+.creature.active {
+    opacity: 1;
+
+    transform:
+        translateY(0)
+        scale(1);
+}
+
+/* ---------- DOG ---------- */
+
+.dog-item {
+    width: 62px;
+    height: 48px;
+}
+
+.dog-body {
+    position: absolute;
+
+    width: 43px;
+    height: 25px;
+
+    left: 10px;
+    bottom: 6px;
+
+    border-radius:
+        45% 50% 40% 40%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #d99a55,
+            #b86e31
+        );
+}
+
+.dog-head {
+    position: absolute;
+
+    width: 28px;
+    height: 28px;
+
+    left: 0;
+    bottom: 19px;
+
+    border-radius: 48%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #e4aa63,
+            #b76d31
+        );
+}
+
+.dog-ear {
+    position: absolute;
+
+    width: 11px;
+    height: 17px;
+
+    top: 0;
+
+    background: #8b4f28;
+
+    border-radius:
+        60% 20% 60% 30%;
+}
+
+.dog-ear.one {
+    left: 2px;
+    transform: rotate(-25deg);
+}
+
+.dog-ear.two {
+    right: 1px;
+    transform: rotate(25deg);
+}
+
+.dog-eye {
+    position: absolute;
+
+    width: 4px;
+    height: 4px;
+
+    border-radius: 50%;
+
+    background: #17202a;
+
+    left: 16px;
+    top: 10px;
+}
+
+.dog-nose {
+    position: absolute;
+
+    width: 6px;
+    height: 5px;
+
+    border-radius: 50%;
+
+    background: #302019;
+
+    left: 1px;
+    top: 15px;
+}
+
+.dog-leg {
+    position: absolute;
+
+    bottom: 0;
+
+    width: 7px;
+    height: 14px;
+
+    border-radius: 4px;
+
+    background: #9b5c2c;
+}
+
+.dog-leg.one {
+    left: 18px;
+}
+
+.dog-leg.two {
+    left: 40px;
+}
+
+.dog-tail {
+    position: absolute;
+
+    width: 22px;
+    height: 16px;
+
+    right: 0;
+    bottom: 22px;
+
+    border-top:
+        5px solid #b86e31;
+
+    border-radius: 50%;
+
+    transform: rotate(25deg);
+}
+
+/* ---------- CAT ---------- */
+
+.cat-item {
+    width: 58px;
+    height: 50px;
+}
+
+.cat-body {
+    position: absolute;
+
+    width: 40px;
+    height: 24px;
+
+    bottom: 5px;
+    left: 9px;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #aeb8c3,
+            #697583
+        );
+}
+
+.cat-head {
+    position: absolute;
+
+    width: 28px;
+    height: 28px;
+
+    left: 0;
+    bottom: 18px;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #c4cbd2,
+            #747f8b
+        );
+}
+
+.cat-ear {
+    position: absolute;
+
+    top: -5px;
+
+    width: 13px;
+    height: 15px;
+
+    background: #87929e;
 
     clip-path:
         polygon(
@@ -513,785 +1103,1249 @@ body{
         );
 }
 
-
-/* DOOR */
-
-.house:after{
-    content:"";
-
-    position:absolute;
-
-    left:38%;
-    bottom:0;
-
-    width:24%;
-    height:48%;
-
-    background:#80523d;
-
-    border-radius:
-        5px 5px 0 0;
+.cat-ear.one {
+    left: 2px;
 }
 
+.cat-ear.two {
+    right: 2px;
+}
 
-/* WINDOWS */
+.cat-eye {
+    position: absolute;
 
-.house-window{
-    position:absolute;
+    width: 4px;
+    height: 5px;
 
-    top:27%;
+    border-radius: 50%;
 
-    width:23%;
-    height:26%;
+    background: #273b20;
 
-    background:#94ddf0;
+    top: 10px;
+}
+
+.cat-eye.one {
+    left: 7px;
+}
+
+.cat-eye.two {
+    right: 7px;
+}
+
+.cat-nose {
+    position: absolute;
+
+    left: 12px;
+    top: 16px;
+
+    width: 5px;
+    height: 4px;
+
+    background: #e78c9e;
+
+    border-radius: 50%;
+}
+
+.cat-tail {
+    position: absolute;
+
+    right: 0;
+    bottom: 17px;
+
+    width: 22px;
+    height: 23px;
 
     border:
-        3px solid #79513d;
+        5px solid #737f8c;
+
+    border-left: 0;
+    border-bottom: 0;
+
+    border-radius: 50%;
 }
 
-.window-left{
-    left:10%;
+/* =========================================================
+   PEOPLE
+   ========================================================= */
+
+.person {
+    width: 44px;
+    height: 86px;
 }
 
-.window-right{
-    right:10%;
-}
+.person-head {
+    position: absolute;
 
+    top: 0;
+    left: 50%;
 
-@keyframes houseAppear{
+    transform: translateX(-50%);
 
-    from{
-        opacity:0;
-        transform:
-            translateX(-50%)
-            scale(.7);
-    }
+    width: 27px;
+    height: 27px;
 
-    to{
-        opacity:1;
-        transform:
-            translateX(-50%)
-            scale(1);
-    }
-}
-
-
-/* =====================================================
-   BUTTERFLIES
-===================================================== */
-
-.butterfly{
-    position:absolute;
-
-    font-size:clamp(28px,5vw,48px);
-
-    animation:
-        butterflyMove
-        4s ease-in-out infinite;
-}
-
-
-/* LEFT OF HOUSE */
-
-.butterfly-1{
-    left:31%;
-    bottom:28%;
-}
-
-
-/* RIGHT OF HOUSE */
-
-.butterfly-2{
-    right:30%;
-    bottom:25%;
-
-    animation-delay:1.2s;
-}
-
-
-@keyframes butterflyMove{
-
-    0%,100%{
-        transform:
-            translate(0,0);
-    }
-
-    50%{
-        transform:
-            translate(12px,-12px);
-    }
-}
-
-
-/* =====================================================
-   BIRDS
-===================================================== */
-
-.bird{
-    position:absolute;
-
-    font-size:clamp(28px,5vw,48px);
-
-    animation:
-        birdMove
-        5s ease-in-out infinite;
-}
-
-
-/* LEFT SKY */
-
-.bird-1{
-    left:18%;
-    top:29%;
-}
-
-
-/* CENTER SKY */
-
-.bird-2{
-    left:53%;
-    top:23%;
-
-    animation-delay:1.5s;
-}
-
-
-@keyframes birdMove{
-
-    0%,100%{
-        transform:translateX(0);
-    }
-
-    50%{
-        transform:
-            translateX(25px)
-            translateY(-8px);
-    }
-}
-
-
-/* =====================================================
-   COMMAND CLOUDS
-===================================================== */
-
-.command-cloud{
-    position:absolute;
-
-    font-size:clamp(42px,8vw,70px);
-
-    animation:
-        cloudMove
-        5s ease-in-out infinite;
-}
-
-
-/* LEFT TOP */
-
-.command-cloud-1{
-    left:28%;
-    top:12%;
-}
-
-
-/* RIGHT TOP */
-
-.command-cloud-2{
-    right:25%;
-    top:29%;
-
-    animation-delay:1.5s;
-}
-
-
-@keyframes cloudMove{
-
-    0%,100%{
-        transform:translateX(0);
-    }
-
-    50%{
-        transform:translateX(12px);
-    }
-}
-
-
-/* =====================================================
-   BOAT
-   INSIDE RIVER
-===================================================== */
-
-.boat{
-    position:absolute;
-
-    left:50%;
-    bottom:11%;
-
-    transform:translateX(-50%);
-
-    font-size:clamp(38px,7vw,62px);
-
-    animation:
-        boatMove
-        3s ease-in-out infinite;
-}
-
-
-@keyframes boatMove{
-
-    0%,100%{
-        transform:
-            translateX(-50%)
-            translateY(0);
-    }
-
-    50%{
-        transform:
-            translateX(-50%)
-            translateY(-4px);
-    }
-}
-
-
-/* =====================================================
-   RAIN
-===================================================== */
-
-#rain{
-    position:absolute;
-
-    inset:0;
-
-    z-index:30;
-
-    opacity:0;
-
-    pointer-events:none;
-
-    transition:.4s;
-}
-
-#rain.visible{
-    opacity:1;
-}
-
-.raindrop{
-    position:absolute;
-
-    width:2px;
-    height:18px;
-
-    background:
-        rgba(255,255,255,.6);
-
-    animation:
-        rainFall
-        linear
-        infinite;
-}
-
-@keyframes rainFall{
-
-    from{
-        transform:translateY(-30px);
-    }
-
-    to{
-        transform:translateY(110vh);
-    }
-}
-
-
-/* =====================================================
-   TITLE
-===================================================== */
-
-.topbar{
-    position:absolute;
-
-    z-index:60;
-
-    top:
-        env(
-            safe-area-inset-top,
-            10px
-        );
-
-    left:0;
-    right:0;
-
-    padding:
-        10px 15px;
-
-    display:flex;
-
-    justify-content:
-        space-between;
-
-    align-items:center;
-
-    pointer-events:none;
-}
-
-.title{
-    color:white;
-
-    font-weight:bold;
-
-    font-size:
-        clamp(
-            17px,
-            4.5vw,
-            28px
-        );
-
-    text-shadow:
-        0 2px 4px rgba(0,0,0,.25);
-}
-
-.music-status{
-    background:
-        rgba(255,255,255,.82);
-
-    padding:
-        6px 10px;
-
-    border-radius:20px;
-
-    color:#477354;
-
-    font-size:11px;
-}
-
-
-/* =====================================================
-   GUIDE
-===================================================== */
-
-.guide{
-    position:absolute;
-
-    z-index:65;
-
-    top:
-        clamp(
-            52px,
-            9vh,
-            82px
-        );
-
-    left:50%;
-
-    transform:
-        translateX(-50%);
-
-    width:min(90%,560px);
-
-    background:
-        rgba(255,255,255,.92);
-
-    border-radius:18px;
-
-    padding:
-        10px 14px;
-
-    text-align:center;
-
-    box-shadow:
-        0 7px 20px
-        rgba(0,0,0,.12);
-}
-
-.guide-title{
-    font-size:13px;
-
-    font-weight:bold;
-
-    color:#47775a;
-}
-
-.guide-text{
-    margin-top:3px;
-
-    color:#526158;
-
-    font-size:
-        clamp(
-            11px,
-            3vw,
-            14px
-        );
-
-    line-height:1.35;
-}
-
-
-/* =====================================================
-   CONTROLS
-===================================================== */
-
-.controls{
-    position:absolute;
-
-    z-index:80;
-
-    bottom:
-        calc(
-            7px +
-            env(
-                safe-area-inset-bottom,
-                0px
-            )
-        );
-
-    left:50%;
-
-    transform:
-        translateX(-50%);
-
-    display:flex;
-
-    gap:8px;
-
-    width:95%;
-
-    justify-content:center;
-}
-
-button{
-    border:0;
-
-    border-radius:18px;
-
-    padding:
-        11px 16px;
-
-    font-size:13px;
-
-    font-weight:bold;
-
-    box-shadow:
-        0 5px 14px
-        rgba(0,0,0,.15);
-}
-
-.voice-btn{
-    background:white;
-
-    color:#427455;
-}
-
-.voice-btn.listening{
-    background:#e4f7df;
-
-    box-shadow:
-        0 0 0 4px
-        rgba(100,190,110,.18),
-        0 5px 14px
-        rgba(0,0,0,.15);
-}
-
-.reset-btn{
-    background:#f7e3c3;
-
-    color:#735638;
-}
-
-
-/* =====================================================
-   START SCREEN
-===================================================== */
-
-#startScreen{
-    position:absolute;
-
-    inset:0;
-
-    z-index:100;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    padding:20px;
+    border-radius: 50%;
 
     background:
         linear-gradient(
-            rgba(80,145,94,.42),
-            rgba(80,145,94,.35)
-        ),
-        #b9e6b0;
-}
-
-.start-card{
-    width:min(92%,450px);
-
-    padding:
-        28px 22px;
-
-    border-radius:25px;
-
-    background:
-        rgba(255,255,255,.96);
-
-    text-align:center;
-
-    box-shadow:
-        0 15px 40px
-        rgba(0,0,0,.18);
-}
-
-.start-card h1{
-    color:#47775a;
-
-    font-size:
-        clamp(
-            25px,
-            7vw,
-            38px
+            135deg,
+            #f4c49b,
+            #c98659
         );
 
-    margin-bottom:10px;
+    box-shadow:
+        inset -4px -4px 6px rgba(120,65,35,.12);
 }
 
-.start-card p{
-    color:#52645a;
+.person-body {
+    position: absolute;
 
-    font-size:14px;
+    top: 26px;
+    left: 50%;
 
-    line-height:1.55;
+    transform: translateX(-50%);
 
-    margin-bottom:20px;
+    width: 31px;
+    height: 38px;
+
+    border-radius:
+        12px 12px 6px 6px;
 }
 
-.start-btn{
-    border:0;
+.person-leg {
+    position: absolute;
 
-    background:#76bd72;
+    top: 61px;
 
-    color:white;
+    width: 9px;
+    height: 25px;
 
-    font-size:16px;
-
-    padding:
-        14px 25px;
-
-    border-radius:20px;
+    border-radius: 5px;
 }
 
+.person-leg.left {
+    left: 12px;
+}
 
-/* =====================================================
-   PHONE
-===================================================== */
+.person-leg.right {
+    right: 12px;
+}
 
-@media(max-width:600px){
+.person-arm {
+    position: absolute;
 
-    .guide{
-        top:67px;
+    top: 29px;
+
+    width: 7px;
+    height: 28px;
+
+    border-radius: 5px;
+}
+
+.person-arm.left {
+    left: 2px;
+    transform: rotate(13deg);
+}
+
+.person-arm.right {
+    right: 2px;
+    transform: rotate(-13deg);
+}
+
+/* MAN */
+
+.man-item .person-head::before {
+    content: "";
+
+    position: absolute;
+
+    top: -4px;
+    left: 3px;
+
+    width: 21px;
+    height: 9px;
+
+    border-radius:
+        60% 60% 30% 30%;
+
+    background: #38251d;
+}
+
+.man-item .person-body,
+.man-item .person-arm {
+    background:
+        linear-gradient(
+            135deg,
+            #3976a8,
+            #235178
+        );
+}
+
+.man-item .person-leg {
+    background:
+        linear-gradient(
+            90deg,
+            #252f42,
+            #172033
+        );
+}
+
+/* WOMAN */
+
+.woman-item .person-head::before {
+    content: "";
+
+    position: absolute;
+
+    top: -6px;
+    left: -5px;
+
+    width: 37px;
+    height: 42px;
+
+    z-index: -1;
+
+    border-radius:
+        48% 48% 55% 55%;
+
+    background:
+        linear-gradient(
+            135deg,
+            #4b2d24,
+            #241914
+        );
+}
+
+.woman-item .person-body {
+    width: 36px;
+    height: 43px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #d45c83,
+            #9e315a
+        );
+
+    border-radius:
+        12px 12px 20px 20px;
+}
+
+.woman-item .person-arm {
+    background: #d45c83;
+}
+
+.woman-item .person-leg {
+    background:
+        linear-gradient(
+            90deg,
+            #7c3b51,
+            #55283a
+        );
+}
+
+/* HUMAN */
+
+.human-item .person-head::before {
+    content: "";
+
+    position: absolute;
+
+    top: -3px;
+    left: 4px;
+
+    width: 19px;
+    height: 8px;
+
+    border-radius: 50%;
+
+    background: #594c42;
+}
+
+.human-item .person-body,
+.human-item .person-arm {
+    background:
+        linear-gradient(
+            135deg,
+            #58a36b,
+            #34734b
+        );
+}
+
+.human-item .person-leg {
+    background:
+        linear-gradient(
+            90deg,
+            #536274,
+            #303c4c
+        );
+}
+
+/* =========================================================
+   BUTTERFLIES
+   ========================================================= */
+
+.butterfly-item {
+    position: absolute;
+
+    width: 30px;
+    height: 25px;
+
+    opacity: 0;
+
+    transform: scale(.3);
+
+    transition:
+        opacity .5s ease,
+        transform .6s cubic-bezier(.34,1.56,.64,1);
+}
+
+.butterfly-item.active {
+    opacity: 1;
+
+    transform: scale(1);
+
+    animation:
+        flutter 4s ease-in-out infinite alternate;
+}
+
+.butterfly-wing {
+    position: absolute;
+
+    width: 13px;
+    height: 20px;
+
+    top: 2px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle at 35% 30%,
+            #fff19a 0 8%,
+            #ff9d43 32%,
+            #ef5275 100%
+        );
+
+    box-shadow:
+        0 3px 7px rgba(100,45,47,.2);
+}
+
+.butterfly-wing.left {
+    left: 0;
+    transform-origin: right center;
+
+    animation:
+        wingLeft .18s ease-in-out infinite alternate;
+}
+
+.butterfly-wing.right {
+    right: 0;
+    transform-origin: left center;
+
+    animation:
+        wingRight .18s ease-in-out infinite alternate;
+}
+
+@keyframes wingLeft {
+    from {
+        transform: rotateY(0deg);
     }
 
-    .guide-text{
-        font-size:11px;
-    }
-
-    .house{
-        bottom:30%;
-    }
-
-    .tree{
-        font-size:55px;
-    }
-
-    .flower{
-        font-size:32px;
+    to {
+        transform: rotateY(70deg);
     }
 }
 
-
-/* =====================================================
-   SMALL PHONE
-===================================================== */
-
-@media(max-width:380px){
-
-    .title{
-        font-size:16px;
+@keyframes wingRight {
+    from {
+        transform: rotateY(0deg);
     }
 
-    .music-status{
-        font-size:10px;
-        padding:5px 8px;
+    to {
+        transform: rotateY(-70deg);
+    }
+}
+
+@keyframes flutter {
+    0% {
+        translate: 0 0;
+        rotate: -5deg;
     }
 
-    .guide{
-        top:63px;
-        width:92%;
-        padding:8px 10px;
+    50% {
+        translate: 0 -18px;
+        rotate: 5deg;
     }
 
-    .guide-text{
-        font-size:10px;
+    100% {
+        translate: 0 -6px;
+        rotate: -3deg;
+    }
+}
+
+/* =========================================================
+   FLOWERS
+   ========================================================= */
+
+.flower-zone {
+    position: absolute;
+
+    bottom: 82px;
+    left: 0;
+    right: 0;
+
+    height: 25%;
+
+    z-index: 7;
+
+    pointer-events: none;
+}
+
+.flower-item {
+    position: absolute;
+
+    bottom: 8px;
+
+    width: 36px;
+    height: 57px;
+
+    opacity: 0;
+
+    transform: scale(0);
+
+    transition:
+        opacity .6s ease,
+        transform .6s cubic-bezier(.34,1.56,.64,1);
+
+    filter:
+        drop-shadow(
+            0 4px 4px rgba(35,83,39,.2)
+        );
+}
+
+.flower-item.active {
+    opacity: 1;
+
+    transform: scale(1);
+
+    animation:
+        sway 3s ease-in-out infinite alternate;
+}
+
+.flower-stem {
+    position: absolute;
+
+    bottom: 0;
+    left: 50%;
+
+    width: 4px;
+    height: 36px;
+
+    transform: translateX(-50%);
+
+    border-radius: 3px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #28763a,
+            #62ad53,
+            #286a34
+        );
+}
+
+.flower-bloom {
+    position: absolute;
+
+    top: 0;
+    left: 50%;
+
+    width: 27px;
+    height: 27px;
+
+    transform: translateX(-50%);
+
+    border-radius: 50%;
+
+    box-shadow:
+        0 3px 8px rgba(52,51,36,.18),
+        inset 2px 2px 5px rgba(255,255,255,.35);
+}
+
+.flower-bloom::after {
+    content: "";
+
+    position: absolute;
+
+    left: 7px;
+    top: 7px;
+
+    width: 13px;
+    height: 13px;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            #fff6a1,
+            #e9a91c
+        );
+}
+
+@keyframes sway {
+    from {
+        rotate: -3deg;
     }
 
-    .tree{
-        font-size:48px;
+    to {
+        rotate: 3deg;
+    }
+}
+
+/* =========================================================
+   GRASS
+   ========================================================= */
+
+.grass-layer {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    height: 48%;
+
+    z-index: 1;
+
+    background:
+        radial-gradient(
+            ellipse at 15% 15%,
+            rgba(135,220,90,.45),
+            transparent 25%
+        ),
+        radial-gradient(
+            ellipse at 75% 18%,
+            rgba(140,220,95,.3),
+            transparent 27%
+        ),
+        var(--grass);
+
+    border-radius:
+        50% 50% 0 0 / 30px 30px 0 0;
+
+    box-shadow:
+        inset 0 16px 28px rgba(255,255,255,.1);
+}
+
+.grass-layer::after {
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    opacity: .16;
+
+    background:
+        repeating-linear-gradient(
+            78deg,
+            transparent 0 14px,
+            rgba(25,91,39,.38) 15px 17px,
+            transparent 18px 31px
+        );
+
+    mask-image:
+        linear-gradient(
+            to bottom,
+            black,
+            transparent
+        );
+}
+
+body.night .grass-layer {
+    background: var(--grass-night);
+}
+
+/* =========================================================
+   RAIN
+   ========================================================= */
+
+.rain-container,
+.snow-container {
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 25;
+
+    pointer-events: none;
+
+    overflow: hidden;
+
+    opacity: 0;
+
+    transition: opacity .7s ease;
+}
+
+.rain-container.active,
+.snow-container.active {
+    opacity: 1;
+}
+
+.raindrop {
+    position: absolute;
+
+    top: -30px;
+
+    width: 2px;
+    height: 18px;
+
+    border-radius: 50%;
+
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(255,255,255,.12),
+            rgba(205,237,255,.85)
+        );
+
+    animation:
+        rainFall linear infinite;
+}
+
+@keyframes rainFall {
+    from {
+        transform: translateY(-30px);
     }
 
-    .flower{
-        font-size:28px;
+    to {
+        transform: translateY(110vh);
+    }
+}
+
+/* =========================================================
+   SNOW
+   ========================================================= */
+
+.snowflake {
+    position: absolute;
+
+    top: -20px;
+
+    width: 8px;
+    height: 8px;
+
+    border-radius: 50%;
+
+    background: rgba(255,255,255,.95);
+
+    box-shadow:
+        0 0 8px rgba(255,255,255,.8);
+
+    animation:
+        snowFall linear infinite;
+}
+
+@keyframes snowFall {
+    0% {
+        transform:
+            translate3d(0,-20px,0)
+            rotate(0);
     }
 
-    .house{
-        width:95px;
-        height:70px;
+    50% {
+        transform:
+            translate3d(25px,50vh,0)
+            rotate(180deg);
     }
 
-    button{
-        padding:
-            9px 12px;
+    100% {
+        transform:
+            translate3d(-20px,110vh,0)
+            rotate(360deg);
+    }
+}
 
-        font-size:11px;
+/* =========================================================
+   RIVER
+   ========================================================= */
+
+.river-zone {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    height: 100px;
+
+    z-index: 20;
+
+    transform: translateY(110%);
+
+    transition:
+        transform 1s cubic-bezier(.34,1.56,.64,1);
+
+    overflow: hidden;
+
+    background:
+        repeating-linear-gradient(
+            -8deg,
+            rgba(255,255,255,.10) 0 3px,
+            transparent 3px 17px
+        ),
+        linear-gradient(
+            180deg,
+            #4ba8d7,
+            #277eb8 50%,
+            #175d96
+        );
+
+    box-shadow:
+        inset 0 10px 18px rgba(255,255,255,.18),
+        inset 0 -14px 20px rgba(5,55,95,.2);
+}
+
+.river-zone.visible {
+    transform: translateY(0);
+}
+
+.river-zone::before,
+.river-zone::after {
+    content: "";
+
+    position: absolute;
+
+    width: 35%;
+    height: 10px;
+
+    top: 25px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255,255,255,.25);
+
+    animation:
+        waterShimmer 4s ease-in-out infinite alternate;
+}
+
+.river-zone::before {
+    left: 8%;
+}
+
+.river-zone::after {
+    right: 8%;
+    animation-delay: 1.4s;
+}
+
+@keyframes waterShimmer {
+    from {
+        transform:
+            translateX(-8px)
+            scaleX(.9);
+        opacity: .3;
+    }
+
+    to {
+        transform:
+            translateX(12px)
+            scaleX(1.1);
+        opacity: .75;
+    }
+}
+
+/* =========================================================
+   BOAT
+   ========================================================= */
+
+.boat {
+    position: absolute;
+
+    left: -70px;
+    bottom: 17px;
+
+    width: 58px;
+    height: 33px;
+
+    opacity: 0;
+
+    border-radius:
+        0 0 28px 28px;
+
+    background:
+        linear-gradient(
+            180deg,
+            #e99a31,
+            #b85d12
+        );
+
+    filter:
+        drop-shadow(
+            0 7px 6px rgba(20,53,70,.3)
+        );
+}
+
+.boat.active {
+    opacity: 1;
+
+    animation:
+        sail 14s linear infinite,
+        bobWater 2s ease-in-out infinite alternate;
+}
+
+@keyframes sail {
+    from {
+        left: -70px;
+    }
+
+    to {
+        left: calc(100vw + 70px);
+    }
+}
+
+@keyframes bobWater {
+    from {
+        transform:
+            translateY(0)
+            rotate(-2deg);
+    }
+
+    to {
+        transform:
+            translateY(-5px)
+            rotate(2deg);
+    }
+}
+
+.boat-sail {
+    position: absolute;
+
+    bottom: 31px;
+    left: 23px;
+
+    width: 0;
+    height: 0;
+
+    border-left: 17px solid transparent;
+    border-right: 6px solid transparent;
+    border-bottom: 28px solid #fffdf4;
+}
+
+/* =========================================================
+   VISUAL COMMAND FEEDBACK
+   ========================================================= */
+
+.highlight-pulse {
+    animation:
+        pulseGlow .65s ease !important;
+}
+
+@keyframes pulseGlow {
+    0% {
+        filter:
+            drop-shadow(
+                0 0 0 transparent
+            );
+
+        scale: 1;
+    }
+
+    50% {
+        filter:
+            drop-shadow(
+                0 0 18px #ffe66d
+            );
+
+        scale: 1.08;
+    }
+
+    100% {
+        filter:
+            drop-shadow(
+                0 0 0 transparent
+            );
+
+        scale: 1;
+    }
+}
+
+/* =========================================================
+   CONTROLS
+   ========================================================= */
+
+.control-panel {
+    position: absolute;
+
+    left: 50%;
+    bottom:
+        max(
+            12px,
+            env(safe-area-inset-bottom)
+        );
+
+    transform: translateX(-50%);
+
+    z-index: 100;
+
+    display: flex;
+    align-items: center;
+
+    gap: 9px;
+
+    padding: 8px 11px;
+
+    border-radius: 30px;
+
+    background:
+        rgba(255,255,255,.72);
+
+    border:
+        1px solid rgba(255,255,255,.55);
+
+    box-shadow:
+        0 14px 38px rgba(27,60,74,.2),
+        inset 0 1px rgba(255,255,255,.8);
+
+    backdrop-filter:
+        blur(18px)
+        saturate(135%);
+
+    -webkit-backdrop-filter:
+        blur(18px)
+        saturate(135%);
+}
+
+.control-btn {
+    width: 48px;
+    height: 48px;
+
+    border: none;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+        rgba(255,255,255,.9);
+
+    color: #23475b;
+
+    font-size: 1.2rem;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 5px 13px rgba(34,67,80,.14),
+        inset 0 1px rgba(255,255,255,.9);
+
+    transition:
+        transform .18s ease,
+        background .18s ease;
+}
+
+.control-btn:active {
+    transform: scale(.9);
+}
+
+.control-btn.active-mic {
+    color: white;
+
+    background:
+        linear-gradient(
+            145deg,
+            #34d399,
+            #16a34a
+        );
+
+    box-shadow:
+        0 0 0 5px rgba(34,197,94,.13),
+        0 7px 18px rgba(22,163,74,.32);
+}
+
+.status-indicator {
+    min-width: 92px;
+
+    text-align: center;
+
+    font-size: .82rem;
+
+    font-weight: 800;
+
+    color: #294c5d;
+}
+
+body.night .control-panel {
+    background:
+        rgba(9,24,38,.74);
+
+    border-color:
+        rgba(220,240,255,.14);
+}
+
+body.night .control-btn {
+    background:
+        rgba(43,65,82,.9);
+
+    color: #eff8ff;
+}
+
+body.night .status-indicator {
+    color: #dcecf7;
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 520px) {
+
+    .app-header {
+        width: calc(100% - 22px);
+        padding: 9px 14px 10px;
+        border-radius: 19px;
+    }
+
+    .app-subtitle {
+        font-size: .73rem;
+    }
+
+    .control-panel {
+        gap: 6px;
+        padding: 7px 8px;
+    }
+
+    .control-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 1.08rem;
+    }
+
+    .status-indicator {
+        min-width: 78px;
+        font-size: .72rem;
+    }
+
+    .rainbow-item {
+        top: 32%;
+    }
+
+    .river-zone {
+        height: 92px;
+    }
+
+    .dog-item {
+        transform-origin: bottom left;
+    }
+
+    .cat-item {
+        transform-origin: bottom left;
+    }
+
+    .person {
+        transform-origin: bottom center;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
     }
 }
 
 </style>
 </head>
 
-
 <body>
 
-<div id="world">
+<div id="garden-container">
 
-    <!-- ================= SKY ================= -->
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
 
-    <div class="sky">
+    <header class="app-header">
 
-        <div id="sun" class="sun"></div>
+        <h1 class="app-title">
+            Whispering Garden
+        </h1>
 
-        <div id="moon" class="moon"></div>
+        <p class="app-subtitle">
+            Speak gently and watch your garden grow.
+        </p>
 
-        <!-- BACKGROUND CLOUDS -->
-
-        <div class="sky-cloud bg-cloud-1"></div>
-        <div class="sky-cloud bg-cloud-2"></div>
-        <div class="sky-cloud bg-cloud-3"></div>
-
-    </div>
-
-
-    <!-- ================= GROUND ================= -->
-
-    <div class="ground"></div>
+    </header>
 
 
-    <!-- ================= RIVER ================= -->
+    <!-- =====================================================
+         SKY
+         ===================================================== -->
 
-    <div id="river">
-
-        <div class="water water-1"></div>
-        <div class="water water-2"></div>
-        <div class="water water-3"></div>
-        <div class="water water-4"></div>
-
-    </div>
-
-
-    <!-- ================= RAIN ================= -->
-
-    <div id="rain"></div>
-
-
-    <!-- ================= OBJECTS ================= -->
-
-    <div id="objects"></div>
-
-
-    <!-- ================= TOP BAR ================= -->
-
-    <div class="topbar">
-
-        <div class="title">
-            🌿 Whispering Garden
-        </div>
+    <div
+        class="sky-zone"
+        id="sky-zone"
+    >
 
         <div
-            id="musicStatus"
-            class="music-status">
-
-            🎵 Music off
-
-        </div>
-
-    </div>
-
-
-    <!-- ================= GUIDE ================= -->
-
-    <div class="guide">
-
-        <div class="guide-title">
-            🌼 Garden Guide
-        </div>
+            class="sun"
+            id="sun-obj"
+        ></div>
 
         <div
-            id="guideText"
-            class="guide-text">
+            class="moon"
+            id="moon-obj"
+        ></div>
 
-            Press Begin Garden.
+        <div
+            class="stars-container"
+            id="stars-container"
+        ></div>
+
+        <!-- Rainbow uses emoji -->
+        <div
+            class="rainbow-item"
+            id="rainbow-obj"
+        >
+            🌈
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MIDDLE
+         ===================================================== -->
+
+    <div
+        class="middle-zone"
+        id="middle-zone"
+    >
+
+        <!-- House -->
+        <div
+            class="house"
+            id="house-obj"
+        >
+
+            <div class="house-roof"></div>
+
+            <div class="house-body">
+
+                <div class="house-window left"></div>
+
+                <div class="house-window right"></div>
+
+                <div class="house-door"></div>
+
+            </div>
 
         </div>
 
     </div>
 
 
-    <!-- ================= CONTROLS ================= -->
+    <!-- =====================================================
+         GRASS
+         ===================================================== -->
 
-    <div class="controls">
+    <div class="grass-layer"></div>
+
+
+    <!-- =====================================================
+         FLOWERS
+         ===================================================== -->
+
+    <div
+        class="flower-zone"
+        id="flower-zone"
+    ></div>
+
+
+    <!-- =====================================================
+         RAIN
+         ===================================================== -->
+
+    <div
+        class="rain-container"
+        id="rain-layer"
+    ></div>
+
+
+    <!-- =====================================================
+         SNOW
+         ===================================================== -->
+
+    <div
+        class="snow-container"
+        id="snow-layer"
+    ></div>
+
+
+    <!-- =====================================================
+         RIVER
+         ===================================================== -->
+
+    <div
+        class="river-zone"
+        id="river-zone"
+    >
+
+        <div
+            class="boat"
+            id="boat-obj"
+        >
+
+            <div class="boat-sail"></div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         CONTROLS
+         ===================================================== -->
+
+    <div class="control-panel">
 
         <button
-            id="voiceButton"
-            class="voice-btn">
+            class="control-btn"
+            id="mic-btn"
+            title="Microphone"
+        >
+            🎤
+        </button>
 
-            🎙️ Speak
+        <span
+            class="status-indicator"
+            id="status-text"
+        >
+            Starting...
+        </span>
 
+        <button
+            class="control-btn"
+            id="music-btn"
+            title="Music"
+        >
+            🎵
         </button>
 
         <button
-            id="resetButton"
-            class="reset-btn">
-
-            🌱 Reset
-
+            class="control-btn"
+            id="reset-btn"
+            title="Reset"
+        >
+            🔄
         </button>
-
-    </div>
-
-
-    <!-- ================= START SCREEN ================= -->
-
-    <div id="startScreen">
-
-        <div class="start-card">
-
-            <h1>
-                🌿 Whispering Garden
-            </h1>
-
-            <p>
-                A peaceful garden that responds to your voice.
-            </p>
-
-            <button
-                id="startButton"
-                class="start-btn">
-
-                🌱 Begin Garden
-
-            </button>
-
-        </div>
 
     </div>
 
@@ -1300,924 +2354,1593 @@ button{
 
 <script>
 
-/* =====================================================
-   ELEMENTS
-===================================================== */
+/* =========================================================
+   STATE
+   ========================================================= */
 
-const objects =
-    document.getElementById("objects");
+let recognition = null;
 
-const river =
-    document.getElementById("river");
+let isListening = false;
 
-const rain =
-    document.getElementById("rain");
+let manualStop = false;
 
-const sun =
-    document.getElementById("sun");
+let audioCtx = null;
 
-const moon =
-    document.getElementById("moon");
+let musicInterval = null;
 
-const startScreen =
-    document.getElementById("startScreen");
+let isMusicPlaying = false;
 
-const startButton =
-    document.getElementById("startButton");
+let isNight = false;
 
-const voiceButton =
-    document.getElementById("voiceButton");
+let rainbowActive = false;
 
-const resetButton =
-    document.getElementById("resetButton");
+let snowActive = false;
 
-const guideText =
-    document.getElementById("guideText");
+let starsManuallyVisible = false;
 
-const musicStatus =
-    document.getElementById("musicStatus");
+let flowerCount = 0;
+let treeCount = 0;
+let butterflyCount = 0;
+let birdCount = 0;
+let cloudCount = 0;
+let starCount = 0;
+let dogCount = 0;
+let catCount = 0;
+let manCount = 0;
+let womanCount = 0;
+let humanCount = 0;
 
+const maxElements = 10;
 
-/* =====================================================
-   AUDIO
-===================================================== */
 
-let audioContext = null;
+/* =========================================================
+   FIXED POSITIONS
+   ========================================================= */
 
-let musicTimer = null;
+/* Flowers */
 
-let musicStarted = false;
+const flowerSlots = [
 
-function initAudio(){
+    { left: "5%" },
+    { left: "14%" },
+    { left: "24%" },
+    { left: "34%" },
+    { left: "44%" },
 
-    if(!audioContext){
-
-        audioContext =
-            new (
-                window.AudioContext ||
-                window.webkitAudioContext
-            )();
-
-    }
-
-    if(
-        audioContext.state ===
-        "suspended"
-    ){
-
-        audioContext.resume();
-
-    }
-
-}
-
-
-/* =====================================================
-   GENTLE TONE
-===================================================== */
-
-function tone(
-    frequency,
-    duration,
-    volume,
-    type="sine"
-){
-
-    if(!audioContext) return;
-
-    const now =
-        audioContext.currentTime;
-
-    const oscillator =
-        audioContext.createOscillator();
-
-    const gain =
-        audioContext.createGain();
-
-    oscillator.type = type;
-
-    oscillator.frequency.setValueAtTime(
-        frequency,
-        now
-    );
-
-    gain.gain.setValueAtTime(
-        0.0001,
-        now
-    );
-
-    gain.gain.exponentialRampToValueAtTime(
-        volume,
-        now + .03
-    );
-
-    gain.gain.exponentialRampToValueAtTime(
-        .0001,
-        now + duration
-    );
-
-    oscillator.connect(gain);
-
-    gain.connect(
-        audioContext.destination
-    );
-
-    oscillator.start(now);
-
-    oscillator.stop(
-        now + duration + .05
-    );
-}
-
-
-/* =====================================================
-   FLOWER BLING
-===================================================== */
-
-function flowerSound(){
-
-    tone(
-        880,
-        .16,
-        .035
-    );
-
-    setTimeout(
-        ()=>{
-            tone(
-                1175,
-                .22,
-                .028
-            );
-        },
-        90
-    );
-
-}
-
-
-/* =====================================================
-   BIRD CHIRP
-===================================================== */
-
-function birdSound(){
-
-    if(!audioContext) return;
-
-    const now =
-        audioContext.currentTime;
-
-    const osc =
-        audioContext.createOscillator();
-
-    const gain =
-        audioContext.createGain();
-
-    osc.type = "sine";
-
-    osc.frequency.setValueAtTime(
-        1250,
-        now
-    );
-
-    osc.frequency.exponentialRampToValueAtTime(
-        2100,
-        now + .12
-    );
-
-    osc.frequency.exponentialRampToValueAtTime(
-        1450,
-        now + .24
-    );
-
-    gain.gain.setValueAtTime(
-        .0001,
-        now
-    );
-
-    gain.gain.exponentialRampToValueAtTime(
-        .03,
-        now + .03
-    );
-
-    gain.gain.exponentialRampToValueAtTime(
-        .0001,
-        now + .3
-    );
-
-    osc.connect(gain);
-
-    gain.connect(
-        audioContext.destination
-    );
-
-    osc.start(now);
-
-    osc.stop(
-        now + .32
-    );
-
-}
-
-
-/* =====================================================
-   RIVER SOUND
-===================================================== */
-
-let riverTimer = null;
-
-function riverSound(){
-
-    if(!audioContext) return;
-
-    if(riverTimer) return;
-
-    function pulse(){
-
-        if(
-            !river.classList.contains(
-                "visible"
-            )
-        ){
-
-            riverTimer = null;
-
-            return;
-        }
-
-        tone(
-            260 +
-            Math.random()*80,
-            .35,
-            .006
-        );
-
-        riverTimer =
-            setTimeout(
-                pulse,
-                500 +
-                Math.random()*500
-            );
-    }
-
-    pulse();
-}
-
-
-/* =====================================================
-   RAIN SOUND
-===================================================== */
-
-let rainTimer = null;
-
-function rainSound(){
-
-    if(!audioContext) return;
-
-    if(rainTimer) return;
-
-    function drop(){
-
-        if(
-            !rain.classList.contains(
-                "visible"
-            )
-        ){
-
-            rainTimer = null;
-
-            return;
-        }
-
-        tone(
-            700 +
-            Math.random()*900,
-            .07,
-            .003
-        );
-
-        rainTimer =
-            setTimeout(
-                drop,
-                90 +
-                Math.random()*150
-            );
-    }
-
-    drop();
-}
-
-
-/* =====================================================
-   CALM BACKGROUND MUSIC
-===================================================== */
-
-const melody = [
-
-    261.63,
-    329.63,
-    392.00,
-    329.63,
-
-    293.66,
-    349.23,
-    440.00,
-    349.23
+    { right: "44%" },
+    { right: "34%" },
+    { right: "24%" },
+    { right: "14%" },
+    { right: "5%" }
 
 ];
 
-let melodyIndex = 0;
 
-function playMusicNote(){
+/* Flowers colors */
 
-    if(!audioContext) return;
+const flowerColors = [
 
-    const note =
-        melody[melodyIndex];
+    "#ff5f7e",
+    "#ff9f68",
+    "#a96be8",
+    "#ffd84d",
+    "#42cbd0",
+    "#ff6bb4",
+    "#ff6a3d",
+    "#9270e8",
+    "#48b878",
+    "#ff3d91"
 
-    melodyIndex =
-        (
-            melodyIndex + 1
-        ) %
-        melody.length;
+];
 
-    tone(
-        note,
-        2.8,
-        .005,
-        "sine"
-    );
+
+/* Trees only at the sides */
+
+const treeSlots = [
+
+    {
+        side: "left",
+        pos: "1%"
+    },
+
+    {
+        side: "right",
+        pos: "1%"
+    },
+
+    {
+        side: "left",
+        pos: "12%"
+    },
+
+    {
+        side: "right",
+        pos: "12%"
+    },
+
+    {
+        side: "left",
+        pos: "24%"
+    },
+
+    {
+        side: "right",
+        pos: "24%"
+    },
+
+    {
+        side: "left",
+        pos: "36%"
+    },
+
+    {
+        side: "right",
+        pos: "36%"
+    },
+
+    {
+        side: "left",
+        pos: "46%"
+    },
+
+    {
+        side: "right",
+        pos: "46%"
+    }
+
+];
+
+
+/* Butterflies */
+
+const butterflySlots = [
+
+    { top: "40%", left: "17%" },
+    { top: "44%", right: "17%" },
+    { top: "49%", left: "27%" },
+    { top: "42%", right: "27%" },
+    { top: "52%", left: "36%" },
+    { top: "47%", right: "36%" },
+    { top: "35%", left: "22%" },
+    { top: "50%", right: "22%" },
+    { top: "45%", left: "31%" },
+    { top: "40%", right: "31%" }
+
+];
+
+
+/* Birds */
+
+const birdSlots = [
+
+    { top: "70px", delay: "0s" },
+    { top: "110px", delay: "2s" },
+    { top: "90px", delay: "4s" },
+    { top: "130px", delay: "1s" },
+    { top: "60px", delay: "3s" },
+    { top: "100px", delay: "5s" },
+    { top: "80px", delay: "2.5s" },
+    { top: "120px", delay: "1.5s" },
+    { top: "95px", delay: "3.5s" },
+    { top: "140px", delay: "4.5s" }
+
+];
+
+
+/* Clouds */
+
+const cloudSlots = [
+
+    {
+        top: "32px",
+        width: "90px",
+        height: "32px",
+        delay: "0s",
+        duration: "22s"
+    },
+
+    {
+        top: "90px",
+        width: "120px",
+        height: "40px",
+        delay: "7s",
+        duration: "28s"
+    },
+
+    {
+        top: "52px",
+        width: "100px",
+        height: "35px",
+        delay: "3s",
+        duration: "25s"
+    },
+
+    {
+        top: "120px",
+        width: "80px",
+        height: "28px",
+        delay: "12s",
+        duration: "30s"
+    },
+
+    {
+        top: "72px",
+        width: "110px",
+        height: "38px",
+        delay: "5s",
+        duration: "24s"
+    },
+
+    {
+        top: "100px",
+        width: "95px",
+        height: "33px",
+        delay: "9s",
+        duration: "26s"
+    },
+
+    {
+        top: "42px",
+        width: "130px",
+        height: "45px",
+        delay: "15s",
+        duration: "32s"
+    },
+
+    {
+        top: "140px",
+        width: "85px",
+        height: "30px",
+        delay: "2s",
+        duration: "20s"
+    },
+
+    {
+        top: "85px",
+        width: "105px",
+        height: "36px",
+        delay: "11s",
+        duration: "27s"
+    },
+
+    {
+        top: "115px",
+        width: "115px",
+        height: "40px",
+        delay: "6s",
+        duration: "29s"
+    }
+
+];
+
+
+/* Stars */
+
+const starSlots = [
+
+    { top: "13%", left: "8%", size: "3px", delay: "0s" },
+    { top: "25%", left: "23%", size: "4px", delay: ".5s" },
+    { top: "12%", left: "39%", size: "2px", delay: "1s" },
+    { top: "30%", left: "57%", size: "3px", delay: ".2s" },
+    { top: "18%", left: "74%", size: "4px", delay: ".8s" },
+    { top: "34%", left: "88%", size: "2px", delay: "1.2s" },
+    { top: "8%", left: "19%", size: "3px", delay: ".4s" },
+    { top: "22%", left: "50%", size: "3px", delay: ".7s" },
+    { top: "10%", left: "84%", size: "2px", delay: ".1s" },
+    { top: "28%", left: "15%", size: "4px", delay: ".9s" }
+
+];
+
+
+/* =========================================================
+   INITIALIZE OBJECTS
+   ========================================================= */
+
+function initGardenElements() {
+
+    const flowerZone =
+        document.getElementById("flower-zone");
+
+    flowerSlots.forEach((slot, i) => {
+
+        const el =
+            document.createElement("div");
+
+        el.className = "flower-item";
+
+        el.id = `flower-${i}`;
+
+        if (slot.left)
+            el.style.left = slot.left;
+
+        if (slot.right)
+            el.style.right = slot.right;
+
+        el.innerHTML = `
+
+            <div class="flower-stem"></div>
+
+            <div
+                class="flower-bloom"
+                style="
+                    background:
+                    ${flowerColors[i]};
+                "
+            ></div>
+
+        `;
+
+        flowerZone.appendChild(el);
+
+    });
+
+
+    /* Trees */
+
+    const middleZone =
+        document.getElementById("middle-zone");
+
+    treeSlots.forEach((slot, i) => {
+
+        const el =
+            document.createElement("div");
+
+        el.className = "tree-item";
+
+        el.id = `tree-${i}`;
+
+        el.style[slot.side] =
+            slot.pos;
+
+        el.innerHTML = `
+
+            <div class="trunk"></div>
+
+            <div class="leaves"></div>
+
+        `;
+
+        middleZone.appendChild(el);
+
+    });
+
+
+    /* Butterflies */
+
+    butterflySlots.forEach((slot, i) => {
+
+        const el =
+            document.createElement("div");
+
+        el.className =
+            "butterfly-item";
+
+        el.id =
+            `butterfly-${i}`;
+
+        el.style.top =
+            slot.top;
+
+        if (slot.left)
+            el.style.left =
+                slot.left;
+
+        if (slot.right)
+            el.style.right =
+                slot.right;
+
+        el.innerHTML = `
+
+            <div
+                class="butterfly-wing left"
+            ></div>
+
+            <div
+                class="butterfly-wing right"
+            ></div>
+
+        `;
+
+        middleZone.appendChild(el);
+
+    });
+
+
+    /* Birds */
+
+    const skyZone =
+        document.getElementById("sky-zone");
+
+    birdSlots.forEach((slot, i) => {
+
+        const el =
+            document.createElement("div");
+
+        el.className =
+            "bird-item";
+
+        el.id =
+            `bird-${i}`;
+
+        el.style.top =
+            slot.top;
+
+        el.style.animationDelay =
+            slot.delay;
+
+        const wing =
+            document.createElement("div");
+
+        wing.className =
+            "bird-wing";
+
+        el.appendChild(wing);
+
+        skyZone.appendChild(el);
+
+    });
+
+
+    /* Clouds */
+
+    cloudSlots.forEach((slot, i) => {
+
+        const el =
+            document.createElement("div");
+
+        el.className =
+            "cloud-item";
+
+        el.id =
+            `cloud-${i}`;
+
+        el.style.top =
+            slot.top;
+
+        el.style.width =
+            slot.width;
+
+        el.style.height =
+            slot.height;
+
+        el.style.animationDelay =
+            slot.delay;
+
+        el.style.animationDuration =
+            slot.duration;
+
+        skyZone.appendChild(el);
+
+    });
+
+
+    /* Stars */
+
+    const stars =
+        document.getElementById(
+            "stars-container"
+        );
+
+    starSlots.forEach((slot, i) => {
+
+        const el =
+            document.createElement("div");
+
+        el.className = "star";
+
+        el.style.top =
+            slot.top;
+
+        el.style.left =
+            slot.left;
+
+        el.style.width =
+            slot.size;
+
+        el.style.height =
+            slot.size;
+
+        el.style.animationDelay =
+            slot.delay;
+
+        stars.appendChild(el);
+
+    });
+
+
+    createCreatures();
+
 }
 
-function startMusic(){
 
-    if(musicStarted)
+/* =========================================================
+   CREATE DOGS / CATS / PEOPLE
+   ========================================================= */
+
+function createCreatures() {
+
+    const middle =
+        document.getElementById(
+            "middle-zone"
+        );
+
+
+    /* Dogs */
+
+    const dogPositions = [
+        { left: "17%", bottom: "3%" },
+        { right: "17%", bottom: "4%" },
+        { left: "29%", bottom: "6%" },
+        { right: "29%", bottom: "6%" },
+        { left: "40%", bottom: "2%" }
+    ];
+
+    dogPositions.forEach((pos, i) => {
+
+        const el =
+            document.createElement("div");
+
+        el.className =
+            "creature dog-item";
+
+        el.id =
+            `dog-${i}`;
+
+        Object.assign(
+            el.style,
+            pos
+        );
+
+        el.innerHTML = `
+
+            <div class="dog-body"></div>
+
+            <div class="dog-head">
+
+                <div class="dog-ear one"></div>
+                <div class="dog-ear two"></div>
+
+                <div class="dog-eye"></div>
+                <div class="dog-nose"></div>
+
+            </div>
+
+            <div class="dog-leg one"></div>
+            <div class="dog-leg two"></div>
+
+            <div class="dog-tail"></div>
+
+        `;
+
+        middle.appendChild(el);
+
+    });
+
+
+    /* Cats */
+
+    const catPositions = [
+        { left: "22%", bottom: "3%" },
+        { right: "22%", bottom: "4%" },
+        { left: "34%", bottom: "7%" },
+        { right: "34%", bottom: "7%" },
+        { left: "44%", bottom: "3%" }
+    ];
+
+    catPositions.forEach((pos, i) => {
+
+        const el =
+            document.createElement("div");
+
+        el.className =
+            "creature cat-item";
+
+        el.id =
+            `cat-${i}`;
+
+        Object.assign(
+            el.style,
+            pos
+        );
+
+        el.innerHTML = `
+
+            <div class="cat-body"></div>
+
+            <div class="cat-head">
+
+                <div class="cat-ear one"></div>
+                <div class="cat-ear two"></div>
+
+                <div class="cat-eye one"></div>
+                <div class="cat-eye two"></div>
+
+                <div class="cat-nose"></div>
+
+            </div>
+
+            <div class="cat-tail"></div>
+
+        `;
+
+        middle.appendChild(el);
+
+    });
+
+
+    /* Man */
+
+    createPeople(
+        "man",
+        [
+            { left: "56%", bottom: "2%" },
+            { left: "62%", bottom: "3%" },
+            { left: "68%", bottom: "2%" }
+        ]
+    );
+
+
+    /* Woman */
+
+    createPeople(
+        "woman",
+        [
+            { right: "56%", bottom: "2%" },
+            { right: "62%", bottom: "3%" },
+            { right: "68%", bottom: "2%" }
+        ]
+    );
+
+
+    /* Human */
+
+    createPeople(
+        "human",
+        [
+            { left: "51%", bottom: "3%" },
+            { right: "51%", bottom: "3%" },
+            { left: "73%", bottom: "4%" }
+        ]
+    );
+
+}
+
+
+function createPeople(
+    type,
+    positions
+) {
+
+    const middle =
+        document.getElementById(
+            "middle-zone"
+        );
+
+    positions.forEach((pos, i) => {
+
+        const el =
+            document.createElement("div");
+
+        el.className =
+            `creature person ${type}-item`;
+
+        el.id =
+            `${type}-${i}`;
+
+        Object.assign(
+            el.style,
+            pos
+        );
+
+        el.innerHTML = `
+
+            <div class="person-head"></div>
+
+            <div class="person-body"></div>
+
+            <div
+                class="person-arm left"
+            ></div>
+
+            <div
+                class="person-arm right"
+            ></div>
+
+            <div
+                class="person-leg left"
+            ></div>
+
+            <div
+                class="person-leg right"
+            ></div>
+
+        `;
+
+        middle.appendChild(el);
+
+    });
+
+}
+
+
+/* =========================================================
+   AUDIO
+   ========================================================= */
+
+function initAudio() {
+
+    try {
+
+        if (!audioCtx) {
+
+            audioCtx =
+                new (
+                    window.AudioContext ||
+                    window.webkitAudioContext
+                )();
+
+        }
+
+        if (
+            audioCtx.state ===
+            "suspended"
+        ) {
+
+            audioCtx.resume();
+
+        }
+
+    } catch (e) {}
+
+}
+
+
+function playTone(
+    freq,
+    type,
+    duration,
+    gainVal = .1
+) {
+
+    try {
+
+        initAudio();
+
+        const now =
+            audioCtx.currentTime;
+
+        const osc =
+            audioCtx.createOscillator();
+
+        const gain =
+            audioCtx.createGain();
+
+        osc.type = type;
+
+        osc.frequency.setValueAtTime(
+            freq,
+            now
+        );
+
+        gain.gain.setValueAtTime(
+            gainVal,
+            now
+        );
+
+        gain.gain.exponentialRampToValueAtTime(
+            .0001,
+            now + duration
+        );
+
+        osc.connect(gain);
+
+        gain.connect(
+            audioCtx.destination
+        );
+
+        osc.start(now);
+
+        osc.stop(
+            now + duration
+        );
+
+    } catch (e) {}
+
+}
+
+
+/* Bird */
+
+function playBirdSound() {
+
+    try {
+
+        initAudio();
+
+        const now =
+            audioCtx.currentTime;
+
+        const osc =
+            audioCtx.createOscillator();
+
+        const gain =
+            audioCtx.createGain();
+
+        osc.type = "sine";
+
+        osc.frequency.setValueAtTime(
+            2200,
+            now
+        );
+
+        osc.frequency.exponentialRampToValueAtTime(
+            3400,
+            now + .08
+        );
+
+        osc.frequency.exponentialRampToValueAtTime(
+            2600,
+            now + .16
+        );
+
+        osc.frequency.exponentialRampToValueAtTime(
+            3800,
+            now + .24
+        );
+
+        gain.gain.setValueAtTime(
+            .1,
+            now
+        );
+
+        gain.gain.exponentialRampToValueAtTime(
+            .0001,
+            now + .3
+        );
+
+        osc.connect(gain);
+
+        gain.connect(
+            audioCtx.destination
+        );
+
+        osc.start(now);
+
+        osc.stop(
+            now + .3
+        );
+
+    } catch (e) {}
+
+}
+
+
+/* Rain */
+
+function playRainSound() {
+
+    try {
+
+        initAudio();
+
+        const now =
+            audioCtx.currentTime;
+
+        const bufferSize =
+            audioCtx.sampleRate * 2;
+
+        const buffer =
+            audioCtx.createBuffer(
+                1,
+                bufferSize,
+                audioCtx.sampleRate
+            );
+
+        const output =
+            buffer.getChannelData(0);
+
+        for (
+            let i = 0;
+            i < bufferSize;
+            i++
+        ) {
+
+            output[i] =
+                Math.random() * 2 - 1;
+
+        }
+
+        const source =
+            audioCtx.createBufferSource();
+
+        source.buffer = buffer;
+
+        const filter =
+            audioCtx.createBiquadFilter();
+
+        filter.type =
+            "lowpass";
+
+        filter.frequency.setValueAtTime(
+            1100,
+            now
+        );
+
+        const gain =
+            audioCtx.createGain();
+
+        gain.gain.setValueAtTime(
+            .015,
+            now
+        );
+
+        gain.gain.linearRampToValueAtTime(
+            .10,
+            now + .5
+        );
+
+        gain.gain.linearRampToValueAtTime(
+            .01,
+            now + 2
+        );
+
+        source.connect(filter);
+
+        filter.connect(gain);
+
+        gain.connect(
+            audioCtx.destination
+        );
+
+        source.start(now);
+
+        source.stop(
+            now + 2
+        );
+
+    } catch (e) {}
+
+}
+
+
+/* River */
+
+function playRiverSound() {
+
+    try {
+
+        initAudio();
+
+        const now =
+            audioCtx.currentTime;
+
+        const bufferSize =
+            audioCtx.sampleRate * 1.5;
+
+        const buffer =
+            audioCtx.createBuffer(
+                1,
+                bufferSize,
+                audioCtx.sampleRate
+            );
+
+        const output =
+            buffer.getChannelData(0);
+
+        for (
+            let i = 0;
+            i < bufferSize;
+            i++
+        ) {
+
+            output[i] =
+                Math.random() * 2 - 1;
+
+        }
+
+        const source =
+            audioCtx.createBufferSource();
+
+        source.buffer =
+            buffer;
+
+        const filter =
+            audioCtx.createBiquadFilter();
+
+        filter.type =
+            "bandpass";
+
+        filter.frequency.setValueAtTime(
+            450,
+            now
+        );
+
+        filter.Q.setValueAtTime(
+            1.5,
+            now
+        );
+
+        const gain =
+            audioCtx.createGain();
+
+        gain.gain.setValueAtTime(
+            .01,
+            now
+        );
+
+        gain.gain.linearRampToValueAtTime(
+            .12,
+            now + .5
+        );
+
+        gain.gain.linearRampToValueAtTime(
+            .01,
+            now + 1.5
+        );
+
+        source.connect(filter);
+
+        filter.connect(gain);
+
+        gain.connect(
+            audioCtx.destination
+        );
+
+        source.start(now);
+
+        source.stop(
+            now + 1.5
+        );
+
+    } catch (e) {}
+
+}
+
+
+/* Standard sounds */
+
+function playFlowerSound() {
+
+    playTone(
+        523.25,
+        "sine",
+        .2,
+        .11
+    );
+
+    setTimeout(() => {
+
+        playTone(
+            659.25,
+            "sine",
+            .3,
+            .11
+        );
+
+    }, 100);
+
+}
+
+
+function playTreeSound() {
+
+    playTone(
+        220,
+        "triangle",
+        .4,
+        .15
+    );
+
+}
+
+
+function playHouseSound() {
+
+    playTone(
+        392,
+        "sine",
+        .3,
+        .11
+    );
+
+    setTimeout(() => {
+
+        playTone(
+            523.25,
+            "sine",
+            .4,
+            .11
+        );
+
+    }, 150);
+
+}
+
+
+function playButterflySound() {
+
+    playTone(
+        880,
+        "sine",
+        .15,
+        .06
+    );
+
+    setTimeout(() => {
+
+        playTone(
+            987.77,
+            "sine",
+            .15,
+            .06
+        );
+
+    }, 100);
+
+}
+
+
+function playCloudSound() {
+
+    playTone(
+        330,
+        "sine",
+        .5,
+        .08
+    );
+
+}
+
+
+function playBoatSound() {
+
+    playTone(
+        261.63,
+        "triangle",
+        .4,
+        .1
+    );
+
+}
+
+
+function playSunSound() {
+
+    playTone(
+        659.25,
+        "sine",
+        .4,
+        .11
+    );
+
+}
+
+
+function playMoonSound() {
+
+    playTone(
+        440,
+        "sine",
+        .4,
+        .11
+    );
+
+}
+
+
+/* Rainbow */
+
+function playRainbowSound() {
+
+    playTone(
+        523.25,
+        "sine",
+        .22,
+        .08
+    );
+
+    setTimeout(() => {
+
+        playTone(
+            659.25,
+            "sine",
+            .22,
+            .08
+        );
+
+    }, 90);
+
+    setTimeout(() => {
+
+        playTone(
+            783.99,
+            "sine",
+            .35,
+            .08
+        );
+
+    }, 180);
+
+}
+
+
+/* Dog */
+
+function playDogSound() {
+
+    try {
+
+        initAudio();
+
+        const now =
+            audioCtx.currentTime;
+
+        const osc =
+            audioCtx.createOscillator();
+
+        const gain =
+            audioCtx.createGain();
+
+        osc.type = "sawtooth";
+
+        osc.frequency.setValueAtTime(
+            170,
+            now
+        );
+
+        osc.frequency.exponentialRampToValueAtTime(
+            105,
+            now + .16
+        );
+
+        gain.gain.setValueAtTime(
+            .12,
+            now
+        );
+
+        gain.gain.exponentialRampToValueAtTime(
+            .0001,
+            now + .2
+        );
+
+        osc.connect(gain);
+
+        gain.connect(
+            audioCtx.destination
+        );
+
+        osc.start(now);
+
+        osc.stop(
+            now + .2
+        );
+
+    } catch (e) {}
+
+}
+
+
+/* Cat */
+
+function playCatSound() {
+
+    try {
+
+        initAudio();
+
+        const now =
+            audioCtx.currentTime;
+
+        const osc =
+            audioCtx.createOscillator();
+
+        const gain =
+            audioCtx.createGain();
+
+        osc.type = "triangle";
+
+        osc.frequency.setValueAtTime(
+            650,
+            now
+        );
+
+        osc.frequency.exponentialRampToValueAtTime(
+            950,
+            now + .12
+        );
+
+        osc.frequency.exponentialRampToValueAtTime(
+            600,
+            now + .35
+        );
+
+        gain.gain.setValueAtTime(
+            .08,
+            now
+        );
+
+        gain.gain.exponentialRampToValueAtTime(
+            .0001,
+            now + .4
+        );
+
+        osc.connect(gain);
+
+        gain.connect(
+            audioCtx.destination
+        );
+
+        osc.start(now);
+
+        osc.stop(
+            now + .4
+        );
+
+    } catch (e) {}
+
+}
+
+
+/* Person sound */
+
+function playPersonSound() {
+
+    playTone(
+        392,
+        "sine",
+        .18,
+        .06
+    );
+
+    setTimeout(() => {
+
+        playTone(
+            523.25,
+            "sine",
+            .25,
+            .06
+        );
+
+    }, 100);
+
+}
+
+
+/* Star */
+
+function playStarSound() {
+
+    playTone(
+        1174.66,
+        "sine",
+        .25,
+        .07
+    );
+
+    setTimeout(() => {
+
+        playTone(
+            1567.98,
+            "sine",
+            .35,
+            .06
+        );
+
+    }, 120);
+
+}
+
+
+/* Snow */
+
+function playSnowSound() {
+
+    playTone(
+        987.77,
+        "sine",
+        .35,
+        .055
+    );
+
+    setTimeout(() => {
+
+        playTone(
+            1318.51,
+            "sine",
+            .45,
+            .05
+        );
+
+    }, 140);
+
+}
+
+
+/* =========================================================
+   BACKGROUND MUSIC
+   ========================================================= */
+
+function startBackgroundMusic() {
+
+    if (isMusicPlaying)
         return;
 
     initAudio();
 
-    musicStarted = true;
+    isMusicPlaying = true;
 
-    musicStatus.textContent =
-        "🎵 Calm music";
-
-    playMusicNote();
-
-    musicTimer =
-        setInterval(
-            playMusicNote,
-            3200
+    const musicBtn =
+        document.getElementById(
+            "music-btn"
         );
-}
 
+    musicBtn.style.background =
+        "#22c55e";
 
-/* =====================================================
-   RAIN DROPS
-===================================================== */
+    musicBtn.style.color =
+        "#fff";
 
-function createRain(){
+    const chordNotes = [
 
-    rain.innerHTML = "";
+        261.63,
+        329.63,
+        392,
+        523.25
 
-    for(
-        let i=0;
-        i<75;
-        i++
-    ){
+    ];
 
-        const drop =
-            document.createElement(
-                "div"
+    /* Immediate first note */
+
+    playTone(
+        261.63,
+        "sine",
+        2.4,
+        .065
+    );
+
+    musicInterval =
+        setInterval(() => {
+
+            if (!isMusicPlaying)
+                return;
+
+            const note =
+                chordNotes[
+                    Math.floor(
+                        Math.random() *
+                        chordNotes.length
+                    )
+                ];
+
+            playTone(
+                note,
+                "sine",
+                2.4,
+                .065
             );
 
-        drop.className =
-            "raindrop";
+        }, 3000);
 
-        drop.style.left =
-            Math.random()*100 +
-            "%";
-
-        drop.style.animationDuration =
-            (
-                .7 +
-                Math.random()*.7
-            ) + "s";
-
-        drop.style.animationDelay =
-            (
-                -Math.random()*2
-            ) + "s";
-
-        rain.appendChild(drop);
-    }
-}
-
-createRain();
-
-
-/* =====================================================
-   FLOWER
-===================================================== */
-
-function addFlower(){
-
-    const count =
-        document.querySelectorAll(
-            ".flower"
-        ).length;
-
-    const positions = [
-
-        "flower-1",
-        "flower-2",
-        "flower-3",
-        "flower-4",
-        "flower-5",
-        "flower-6"
-
-    ];
-
-    if(
-        count >=
-        positions.length
-    ){
-
-        flowerSound();
-
-        return;
-    }
-
-    const flower =
-        document.createElement(
-            "div"
-        );
-
-    flower.className =
-        "flower " +
-        positions[count];
-
-    const types = [
-        "🌷",
-        "🌸",
-        "🌼",
-        "🌻",
-        "🌺"
-    ];
-
-    flower.textContent =
-        types[
-            count %
-            types.length
-        ];
-
-    objects.appendChild(
-        flower
-    );
-
-    flowerSound();
 }
 
 
-/* =====================================================
-   TREE
-===================================================== */
+function stopBackgroundMusic() {
 
-function addTree(){
+    isMusicPlaying = false;
 
-    const count =
-        document.querySelectorAll(
-            ".tree"
-        ).length;
+    if (musicInterval) {
 
-    const positions = [
-
-        "tree-1",
-        "tree-2",
-        "tree-3",
-        "tree-4"
-
-    ];
-
-    if(
-        count >=
-        positions.length
-    ){
-
-        tone(
-            330,
-            .3,
-            .015
+        clearInterval(
+            musicInterval
         );
 
-        return;
+        musicInterval = null;
+
     }
 
-    const tree =
-        document.createElement(
-            "div"
+    const musicBtn =
+        document.getElementById(
+            "music-btn"
         );
 
-    tree.className =
-        "tree " +
-        positions[count];
+    musicBtn.style.background =
+        "";
 
-    tree.textContent =
-        "🌳";
+    musicBtn.style.color =
+        "";
 
-    objects.appendChild(
-        tree
-    );
-
-    tone(
-        330,
-        .3,
-        .015
-    );
 }
 
 
-/* =====================================================
-   HOUSE
-===================================================== */
+/* =========================================================
+   TTS WELCOME
+   ========================================================= */
 
-function addHouse(){
+function speakWelcome() {
 
-    if(
-        document.querySelector(
-            ".house"
-        )
-    ){
+    const welcomeText =
+        "Welcome to the garden. You can say flower, tree, house, butterfly, bird, cloud, rain, river, boat, rainbow, dog, cat, man, woman, human, sun, day, moon, night, star, or snow.";
 
-        return;
-    }
+    stopRecognition();
 
-    const house =
-        document.createElement(
-            "div"
-        );
-
-    house.className =
-        "house";
-
-    const leftWindow =
-        document.createElement(
-            "div"
-        );
-
-    leftWindow.className =
-        "house-window window-left";
-
-    const rightWindow =
-        document.createElement(
-            "div"
-        );
-
-    rightWindow.className =
-        "house-window window-right";
-
-    house.appendChild(
-        leftWindow
+    updateStatus(
+        "Welcome..."
     );
 
-    house.appendChild(
-        rightWindow
-    );
+    if (
+        "speechSynthesis"
+        in window
+    ) {
 
-    objects.appendChild(
-        house
-    );
+        window.speechSynthesis.cancel();
 
-    tone(
-        390,
-        .25,
-        .018
-    );
-
-    setTimeout(
-        ()=>{
-            tone(
-                520,
-                .3,
-                .014
+        const utterance =
+            new SpeechSynthesisUtterance(
+                welcomeText
             );
-        },
-        120
-    );
-}
 
+        utterance.rate = .9;
 
-/* =====================================================
-   BUTTERFLY
-===================================================== */
+        utterance.pitch = 1;
 
-function addButterfly(){
+        utterance.volume = 1;
 
-    const count =
-        document.querySelectorAll(
-            ".butterfly"
-        ).length;
+        utterance.onend = () => {
 
-    const positions = [
-        "butterfly-1",
-        "butterfly-2"
-    ];
+            startBackgroundMusic();
 
-    if(
-        count >=
-        positions.length
-    ){
-
-        return;
-    }
-
-    const butterfly =
-        document.createElement(
-            "div"
-        );
-
-    butterfly.className =
-        "butterfly " +
-        positions[count];
-
-    butterfly.textContent =
-        "🦋";
-
-    objects.appendChild(
-        butterfly
-    );
-
-    tone(
-        740,
-        .2,
-        .014
-    );
-
-    setTimeout(
-        ()=>{
-            tone(
-                930,
-                .22,
-                .011
+            setTimeout(
+                startRecognition,
+                350
             );
-        },
-        120
-    );
-}
 
+        };
 
-/* =====================================================
-   BIRD
-===================================================== */
+        utterance.onerror = () => {
 
-function addBird(){
+            startBackgroundMusic();
 
-    const count =
-        document.querySelectorAll(
-            ".bird"
-        ).length;
+            startRecognition();
 
-    const positions = [
-        "bird-1",
-        "bird-2"
-    ];
+        };
 
-    if(
-        count >=
-        positions.length
-    ){
-
-        birdSound();
-
-        return;
-    }
-
-    const bird =
-        document.createElement(
-            "div"
+        window.speechSynthesis.speak(
+            utterance
         );
 
-    bird.className =
-        "bird " +
-        positions[count];
+    } else {
 
-    bird.textContent =
-        "🐦";
+        startBackgroundMusic();
 
-    objects.appendChild(
-        bird
-    );
-
-    birdSound();
-}
-
-
-/* =====================================================
-   CLOUD
-===================================================== */
-
-function addCloud(){
-
-    const count =
-        document.querySelectorAll(
-            ".command-cloud"
-        ).length;
-
-    const positions = [
-
-        "command-cloud-1",
-        "command-cloud-2"
-
-    ];
-
-    if(
-        count >=
-        positions.length
-    ){
-
-        return;
-    }
-
-    const cloud =
-        document.createElement(
-            "div"
-        );
-
-    cloud.className =
-        "command-cloud " +
-        positions[count];
-
-    cloud.textContent =
-        "☁️";
-
-    objects.appendChild(
-        cloud
-    );
-
-    tone(
-        420,
-        .45,
-        .01
-    );
-}
-
-
-/* =====================================================
-   RIVER
-===================================================== */
-
-function activateRiver(){
-
-    river.classList.add(
-        "visible"
-    );
-
-    riverSound();
-}
-
-
-/* =====================================================
-   RAIN
-===================================================== */
-
-function activateRain(){
-
-    rain.classList.add(
-        "visible"
-    );
-
-    rainSound();
-}
-
-
-/* =====================================================
-   BOAT
-===================================================== */
-
-function addBoat(){
-
-    /*
-       River must exist before boat.
-    */
-
-    if(
-        !river.classList.contains(
-            "visible"
-        )
-    ){
-
-        activateRiver();
+        startRecognition();
 
     }
 
-    if(
-        document.querySelector(
-            ".boat"
-        )
-    ){
-
-        return;
-    }
-
-    const boat =
-        document.createElement(
-            "div"
-        );
-
-    boat.className =
-        "boat";
-
-    boat.textContent =
-        "⛵";
-
-    objects.appendChild(
-        boat
-    );
-
-    tone(
-        280,
-        .3,
-        .015
-    );
-
-    setTimeout(
-        ()=>{
-            tone(
-                340,
-                .3,
-                .012
-            );
-        },
-        150
-    );
 }
 
 
-/* =====================================================
-   SUN
-===================================================== */
-
-function setDay(){
-
-    sun.classList.remove(
-        "hidden"
-    );
-
-    moon.classList.remove(
-        "visible"
-    );
-
-    tone(
-        520,
-        .3,
-        .015
-    );
-}
-
-
-/* =====================================================
-   MOON
-===================================================== */
-
-function setNight(){
-
-    sun.classList.add(
-        "hidden"
-    );
-
-    moon.classList.add(
-        "visible"
-    );
-
-    tone(
-        440,
-        .5,
-        .01
-    );
-
-}
-
-
-/* =====================================================
+/* =========================================================
    SPEECH RECOGNITION
-===================================================== */
+   ========================================================= */
 
-const SpeechRecognition =
-    window.SpeechRecognition ||
-    window.webkitSpeechRecognition;
+function setupSpeechRecognition() {
 
-let recognition = null;
+    const SpeechRecognitionAPI =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
 
-let recognitionRunning =
-    false;
+    if (!SpeechRecognitionAPI) {
 
-let manuallyStopped =
-    true;
+        updateStatus(
+            "Voice unsupported"
+        );
 
+        return;
 
-if(SpeechRecognition){
+    }
 
     recognition =
-        new SpeechRecognition();
+        new SpeechRecognitionAPI();
 
     recognition.lang =
         "en-IN";
@@ -2232,520 +3955,1388 @@ if(SpeechRecognition){
         1;
 
 
-    recognition.onstart =
-        function(){
+    recognition.onstart = () => {
 
-            recognitionRunning =
-                true;
+        isListening = true;
 
-            voiceButton.classList.add(
-                "listening"
-            );
+        document
+            .getElementById("mic-btn")
+            .classList
+            .add("active-mic");
 
-            voiceButton.textContent =
-                "🎙️ Listening...";
+        updateStatus(
+            "Listening..."
+        );
 
-        };
+    };
 
 
     recognition.onresult =
-        function(event){
+        event => {
 
-            for(
-                let i =
-                    event.resultIndex;
+            const lastIndex =
+                event.results.length - 1;
 
-                i <
-                    event.results.length;
+            const transcript =
+                event
+                    .results[lastIndex][0]
+                    .transcript
+                    .toLowerCase()
+                    .trim();
 
-                i++
-            ){
-
-                if(
-                    event.results[i]
-                        .isFinal
-                ){
-
-                    const text =
-                        event.results[i][0]
-                            .transcript
-                            .toLowerCase()
-                            .trim();
-
-                    processCommand(
-                        text
-                    );
-
-                }
-
-            }
+            handleCommand(
+                transcript
+            );
 
         };
 
 
     recognition.onerror =
-        function(event){
+        event => {
 
-            recognitionRunning =
-                false;
-
-            voiceButton.classList.remove(
-                "listening"
-            );
-
-            voiceButton.textContent =
-                "🎙️ Speak";
-
-            if(
+            if (
                 event.error ===
                 "not-allowed"
-            ){
+            ) {
 
-                manuallyStopped =
-                    true;
-
-                guideText.textContent =
-                    "Please allow microphone access.";
-
-            }
-
-        };
-
-
-    recognition.onend =
-        function(){
-
-            recognitionRunning =
-                false;
-
-            voiceButton.classList.remove(
-                "listening"
-            );
-
-            voiceButton.textContent =
-                "🎙️ Speak";
-
-
-            if(
-                !manuallyStopped
-            ){
-
-                setTimeout(
-                    startRecognition,
-                    250
+                updateStatus(
+                    "Mic blocked"
                 );
 
+                manualStop = true;
+
             }
 
         };
 
+
+    recognition.onend = () => {
+
+        isListening = false;
+
+        document
+            .getElementById("mic-btn")
+            .classList
+            .remove("active-mic");
+
+        if (!manualStop) {
+
+            setTimeout(() => {
+
+                if (
+                    !manualStop &&
+                    !isListening
+                ) {
+
+                    startRecognition();
+
+                }
+
+            }, 250);
+
+        } else {
+
+            updateStatus(
+                "Microphone off"
+            );
+
+        }
+
+    };
+
 }
 
 
-/* =====================================================
-   START RECOGNITION
-===================================================== */
+function startRecognition() {
 
-function startRecognition(){
-
-    if(!recognition)
+    if (!recognition)
         return;
 
-    if(recognitionRunning)
-        return;
+    manualStop = false;
 
-    if(manuallyStopped)
-        return;
+    try {
 
-    try{
+        if (!isListening) {
 
-        recognition.start();
+            recognition.start();
 
-    }catch(error){
+        }
 
-    }
+    } catch (e) {}
 
 }
 
 
-/* =====================================================
-   STOP RECOGNITION
-===================================================== */
+function stopRecognition() {
 
-function stopRecognition(){
+    manualStop = true;
 
-    manuallyStopped =
-        true;
+    if (recognition) {
 
-    if(
-        recognition &&
-        recognitionRunning
-    ){
-
-        try{
+        try {
 
             recognition.stop();
 
-        }catch(e){}
+        } catch (e) {}
 
     }
 
-    recognitionRunning =
-        false;
+    isListening = false;
 
-    voiceButton.classList.remove(
-        "listening"
+    document
+        .getElementById("mic-btn")
+        .classList
+        .remove("active-mic");
+
+    updateStatus(
+        "Microphone off"
     );
 
-    voiceButton.textContent =
-        "🎙️ Speak";
 }
 
 
-/* =====================================================
-   COMMAND PROCESSING
-===================================================== */
+function updateStatus(text) {
 
-function processCommand(
-    text
-){
+    document
+        .getElementById(
+            "status-text"
+        )
+        .textContent = text;
+
+}
+
+
+/* =========================================================
+   WORD DETECTION
+   IMPORTANT:
+   "human" must NOT trigger "man"
+   "woman" must NOT trigger "man"
+   ========================================================= */
+
+function hasWord(
+    text,
+    word
+) {
+
+    const escaped =
+        word.replace(
+            /[.*+?^${}()|[\]\\]/g,
+            "\\$&"
+        );
+
+    return new RegExp(
+        `\\b${escaped}\\b`,
+        "i"
+    ).test(text);
+
+}
+
+
+/* =========================================================
+   COMMAND PROCESSING
+   ========================================================= */
+
+function handleCommand(text) {
 
     console.log(
-        "Voice:",
+        "Voice command:",
         text
     );
 
 
-    if(
-        text.includes("flower") ||
-        text.includes("flowers") ||
-        text.includes("bloom")
-    ){
+    if (
+        hasWord(
+            text,
+            "flower"
+        )
+    ) {
 
-        addFlower();
+        activateFlower();
 
-        return;
     }
 
 
-    if(
-        text.includes("tree") ||
-        text.includes("trees")
-    ){
+    if (
+        hasWord(
+            text,
+            "tree"
+        )
+    ) {
 
-        addTree();
+        activateTree();
 
-        return;
     }
 
 
-    if(
-        text.includes("house") ||
-        text.includes("home")
-    ){
+    if (
+        hasWord(
+            text,
+            "house"
+        )
+    ) {
 
-        addHouse();
+        activateHouse();
 
-        return;
     }
 
 
-    if(
-        text.includes("butterfly") ||
-        text.includes("butterflies")
-    ){
+    if (
+        hasWord(
+            text,
+            "butterfly"
+        )
+    ) {
 
-        addButterfly();
+        activateButterfly();
 
-        return;
     }
 
 
-    if(
-        text.includes("bird") ||
-        text.includes("birds")
-    ){
+    if (
+        hasWord(
+            text,
+            "bird"
+        )
+    ) {
 
-        addBird();
+        activateBird();
 
-        return;
     }
 
 
-    if(
-        text.includes("cloud") ||
-        text.includes("clouds")
-    ){
+    if (
+        hasWord(
+            text,
+            "cloud"
+        )
+    ) {
 
-        addCloud();
+        activateCloud();
 
-        return;
     }
 
 
-    if(
-        text.includes("rain") ||
-        text.includes("raining")
-    ){
+    if (
+        hasWord(
+            text,
+            "rain"
+        )
+    ) {
 
         activateRain();
 
-        return;
     }
 
 
-    if(
-        text.includes("river") ||
-        text.includes("water")
-    ){
+    if (
+        hasWord(
+            text,
+            "river"
+        )
+    ) {
 
         activateRiver();
 
-        return;
     }
 
 
-    if(
-        text.includes("boat")
-    ){
+    if (
+        hasWord(
+            text,
+            "boat"
+        )
+    ) {
 
-        addBoat();
+        activateBoat();
 
-        return;
     }
 
 
-    if(
-        text.includes("sun") ||
-        text.includes("day")
-    ){
+    if (
+        hasWord(
+            text,
+            "rainbow"
+        )
+    ) {
 
-        setDay();
+        activateRainbow();
 
-        return;
     }
 
 
-    if(
-        text.includes("moon") ||
-        text.includes("night")
-    ){
+    /* Day */
 
-        setNight();
+    if (
+        hasWord(
+            text,
+            "day"
+        ) ||
+        hasWord(
+            text,
+            "sun"
+        )
+    ) {
 
-        return;
+        activateSun();
+
+    }
+
+
+    /* Night */
+
+    if (
+        hasWord(
+            text,
+            "night"
+        ) ||
+        hasWord(
+            text,
+            "moon"
+        )
+    ) {
+
+        activateMoon();
+
+    }
+
+
+    /* Star */
+
+    if (
+        hasWord(
+            text,
+            "star"
+        ) ||
+        hasWord(
+            text,
+            "stars"
+        )
+    ) {
+
+        activateStarsCommand();
+
+    }
+
+
+    /* Dog */
+
+    if (
+        hasWord(
+            text,
+            "dog"
+        )
+    ) {
+
+        activateDog();
+
+    }
+
+
+    /* Cat */
+
+    if (
+        hasWord(
+            text,
+            "cat"
+        )
+    ) {
+
+        activateCat();
+
+    }
+
+
+    /* IMPORTANT:
+       human checked separately using word boundary */
+
+    if (
+        hasWord(
+            text,
+            "human"
+        )
+    ) {
+
+        activateHuman();
+
+    }
+
+
+    /* Man */
+
+    if (
+        hasWord(
+            text,
+            "man"
+        )
+    ) {
+
+        activateMan();
+
+    }
+
+
+    /* Woman */
+
+    if (
+        hasWord(
+            text,
+            "woman"
+        )
+    ) {
+
+        activateWoman();
+
+    }
+
+
+    /* Snow */
+
+    if (
+        hasWord(
+            text,
+            "snow"
+        )
+    ) {
+
+        activateSnow();
+
     }
 
 }
 
 
-/* =====================================================
-   VOICE BUTTON
-===================================================== */
+/* =========================================================
+   OBJECT ACTIVATION
+   ========================================================= */
 
-voiceButton.addEventListener(
-    "click",
-    function(){
+function activateFlower() {
 
-        initAudio();
+    playFlowerSound();
 
-        if(!recognition){
+    if (
+        flowerCount <
+        maxElements
+    ) {
 
-            guideText.textContent =
-                "Voice recognition is not supported. Please use Chrome.";
-
-            return;
-        }
-
-
-        if(
-            recognitionRunning
-        ){
-
-            stopRecognition();
-
-        }else{
-
-            manuallyStopped =
-                false;
-
-            startRecognition();
-
-        }
-
-    }
-);
-
-
-/* =====================================================
-   START
-===================================================== */
-
-startButton.addEventListener(
-    "click",
-    function(){
-
-        /*
-           Initialize audio only.
-           Do NOT start music yet.
-        */
-
-        initAudio();
-
-        startScreen.style.display =
-            "none";
-
-        guideText.textContent =
-            "Listen to the garden guide...";
-
-
-        /*
-           MICROPHONE IS OFF WHILE
-           THE GUIDE IS SPEAKING.
-        */
-
-        stopRecognition();
-
-
-        speechSynthesis.cancel();
-
-
-        const message =
-            "Welcome to the garden. " +
-            "You can say flower, tree, house, butterfly, bird, cloud, rain, river, boat, sun, moon.";
-
-
-        const speech =
-            new SpeechSynthesisUtterance(
-                message
+        const el =
+            document.getElementById(
+                `flower-${flowerCount}`
             );
 
-        speech.lang =
-            "en-IN";
+        if (el) {
 
-        speech.rate =
-            0.9;
+            el.classList.add(
+                "active"
+            );
 
-        speech.pitch =
-            1.0;
+            flowerCount++;
 
-        speech.volume =
-            0.9;
+        }
 
+    } else {
 
-        speech.onend =
-            function(){
-
-                /*
-                   THE COMPLETE SENTENCE
-                   HAS FINISHED.
-
-                   NOW START MUSIC.
-                */
-
-                startMusic();
-
-
-                guideText.textContent =
-                    "Your garden is ready. Speak whenever you like.";
-
-
-                /*
-                   Give the audio system a
-                   small moment to settle.
-
-                   THEN start microphone.
-                */
-
-                setTimeout(
-                    function(){
-
-                        manuallyStopped =
-                            false;
-
-                        startRecognition();
-
-                    },
-                    600
-                );
-
-            };
-
-
-        speech.onerror =
-            function(){
-
-                startMusic();
-
-                setTimeout(
-                    function(){
-
-                        manuallyStopped =
-                            false;
-
-                        startRecognition();
-
-                    },
-                    600
-                );
-
-            };
-
-
-        speechSynthesis.speak(
-            speech
+        pulseLatest(
+            "flower-item"
         );
 
     }
-);
+
+}
 
 
-/* =====================================================
-   RESET
-===================================================== */
+function activateTree() {
 
-resetButton.addEventListener(
-    "click",
-    function(){
+    playTreeSound();
 
-        stopRecognition();
+    if (
+        treeCount <
+        maxElements
+    ) {
 
-        objects.innerHTML = "";
+        const el =
+            document.getElementById(
+                `tree-${treeCount}`
+            );
 
-        river.classList.remove(
-            "visible"
+        if (el) {
+
+            el.classList.add(
+                "active"
+            );
+
+            treeCount++;
+
+        }
+
+    } else {
+
+        pulseLatest(
+            "tree-item"
         );
 
-        rain.classList.remove(
-            "visible"
+    }
+
+}
+
+
+function activateHouse() {
+
+    playHouseSound();
+
+    const house =
+        document.getElementById(
+            "house-obj"
         );
+
+    house.classList.add(
+        "active"
+    );
+
+    house.classList.add(
+        "highlight-pulse"
+    );
+
+    setTimeout(() => {
+
+        house.classList.remove(
+            "highlight-pulse"
+        );
+
+    }, 650);
+
+}
+
+
+function activateButterfly() {
+
+    playButterflySound();
+
+    if (
+        butterflyCount <
+        maxElements
+    ) {
+
+        const el =
+            document.getElementById(
+                `butterfly-${butterflyCount}`
+            );
+
+        if (el) {
+
+            el.classList.add(
+                "active"
+            );
+
+            butterflyCount++;
+
+        }
+
+    } else {
+
+        pulseLatest(
+            "butterfly-item"
+        );
+
+    }
+
+}
+
+
+function activateBird() {
+
+    playBirdSound();
+
+    if (
+        birdCount <
+        maxElements
+    ) {
+
+        const el =
+            document.getElementById(
+                `bird-${birdCount}`
+            );
+
+        if (el) {
+
+            el.classList.add(
+                "active"
+            );
+
+            birdCount++;
+
+        }
+
+    } else {
+
+        pulseLatest(
+            "bird-item"
+        );
+
+    }
+
+}
+
+
+function activateCloud() {
+
+    playCloudSound();
+
+    if (
+        cloudCount <
+        maxElements
+    ) {
+
+        const el =
+            document.getElementById(
+                `cloud-${cloudCount}`
+            );
+
+        if (el) {
+
+            el.classList.add(
+                "active"
+            );
+
+            cloudCount++;
+
+        }
+
+    } else {
+
+        pulseLatest(
+            "cloud-item"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   RAIN
+   ========================================================= */
+
+function activateRain() {
+
+    playRainSound();
+
+    const rain =
+        document.getElementById(
+            "rain-layer"
+        );
+
+    rain.classList.add(
+        "active"
+    );
+
+    if (
+        rain.children.length === 0
+    ) {
+
+        for (
+            let i = 0;
+            i < 50;
+            i++
+        ) {
+
+            const drop =
+                document.createElement(
+                    "div"
+                );
+
+            drop.className =
+                "raindrop";
+
+            drop.style.left =
+                `${Math.random() * 100}%`;
+
+            drop.style.animationDuration =
+                `${.55 + Math.random() * .65}s`;
+
+            drop.style.animationDelay =
+                `${Math.random() * 2}s`;
+
+            rain.appendChild(
+                drop
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   RIVER
+   ========================================================= */
+
+function activateRiver() {
+
+    playRiverSound();
+
+    document
+        .getElementById(
+            "river-zone"
+        )
+        .classList
+        .add("visible");
+
+}
+
+
+function activateBoat() {
+
+    playBoatSound();
+
+    activateRiver();
+
+    document
+        .getElementById(
+            "boat-obj"
+        )
+        .classList
+        .add("active");
+
+}
+
+
+/* =========================================================
+   RAINBOW
+   ========================================================= */
+
+function activateRainbow() {
+
+    playRainbowSound();
+
+    const rainbow =
+        document.getElementById(
+            "rainbow-obj"
+        );
+
+    rainbow.classList.add(
+        "active"
+    );
+
+    rainbowActive = true;
+
+    rainbow.classList.remove(
+        "highlight-pulse"
+    );
+
+    void rainbow.offsetWidth;
+
+    rainbow.classList.add(
+        "highlight-pulse"
+    );
+
+}
+
+
+/* =========================================================
+   DAY
+   ========================================================= */
+
+function activateSun() {
+
+    playSunSound();
+
+    isNight = false;
+
+    document.body.classList.remove(
+        "night"
+    );
+
+    const sun =
+        document.getElementById(
+            "sun-obj"
+        );
+
+    sun.classList.add(
+        "highlight-pulse"
+    );
+
+    setTimeout(() => {
 
         sun.classList.remove(
-            "hidden"
+            "highlight-pulse"
         );
 
+    }, 650);
+
+}
+
+
+/* =========================================================
+   NIGHT
+   ========================================================= */
+
+function activateMoon() {
+
+    playMoonSound();
+
+    isNight = true;
+
+    document.body.classList.add(
+        "night"
+    );
+
+    const moon =
+        document.getElementById(
+            "moon-obj"
+        );
+
+    moon.classList.add(
+        "highlight-pulse"
+    );
+
+    setTimeout(() => {
+
         moon.classList.remove(
+            "highlight-pulse"
+        );
+
+    }, 650);
+
+}
+
+
+/* =========================================================
+   STARS
+   ========================================================= */
+
+function activateStarsCommand() {
+
+    playStarSound();
+
+    starsManuallyVisible =
+        true;
+
+    const stars =
+        document.getElementById(
+            "stars-container"
+        );
+
+    stars.classList.add(
+        "manual-visible"
+    );
+
+    stars.classList.add(
+        "highlight-pulse"
+    );
+
+    setTimeout(() => {
+
+        stars.classList.remove(
+            "highlight-pulse"
+        );
+
+    }, 650);
+
+}
+
+
+/* =========================================================
+   DOG
+   ========================================================= */
+
+function activateDog() {
+
+    playDogSound();
+
+    if (
+        dogCount <
+        maxElements
+    ) {
+
+        const dog =
+            document.getElementById(
+                `dog-${dogCount}`
+            );
+
+        if (dog) {
+
+            dog.classList.add(
+                "active"
+            );
+
+            dogCount++;
+
+        }
+
+    } else {
+
+        pulseLatest(
+            "dog-item"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   CAT
+   ========================================================= */
+
+function activateCat() {
+
+    playCatSound();
+
+    if (
+        catCount <
+        maxElements
+    ) {
+
+        const cat =
+            document.getElementById(
+                `cat-${catCount}`
+            );
+
+        if (cat) {
+
+            cat.classList.add(
+                "active"
+            );
+
+            catCount++;
+
+        }
+
+    } else {
+
+        pulseLatest(
+            "cat-item"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   MAN
+   ========================================================= */
+
+function activateMan() {
+
+    playPersonSound();
+
+    const available =
+        document.querySelector(
+            ".man-item:not(.active)"
+        );
+
+    if (available) {
+
+        available.classList.add(
+            "active"
+        );
+
+        manCount++;
+
+    } else {
+
+        pulseLatest(
+            "man-item"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   WOMAN
+   ========================================================= */
+
+function activateWoman() {
+
+    playPersonSound();
+
+    const available =
+        document.querySelector(
+            ".woman-item:not(.active)"
+        );
+
+    if (available) {
+
+        available.classList.add(
+            "active"
+        );
+
+        womanCount++;
+
+    } else {
+
+        pulseLatest(
+            "woman-item"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   HUMAN
+   ========================================================= */
+
+function activateHuman() {
+
+    playPersonSound();
+
+    const available =
+        document.querySelector(
+            ".human-item:not(.active)"
+        );
+
+    if (available) {
+
+        available.classList.add(
+            "active"
+        );
+
+        humanCount++;
+
+    } else {
+
+        pulseLatest(
+            "human-item"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   SNOW
+   ========================================================= */
+
+function activateSnow() {
+
+    playSnowSound();
+
+    const snow =
+        document.getElementById(
+            "snow-layer"
+        );
+
+    snow.classList.add(
+        "active"
+    );
+
+    snowActive = true;
+
+    if (
+        snow.children.length === 0
+    ) {
+
+        for (
+            let i = 0;
+            i < 45;
+            i++
+        ) {
+
+            const flake =
+                document.createElement(
+                    "div"
+                );
+
+            flake.className =
+                "snowflake";
+
+            const size =
+                4 +
+                Math.random() * 7;
+
+            flake.style.width =
+                `${size}px`;
+
+            flake.style.height =
+                `${size}px`;
+
+            flake.style.left =
+                `${Math.random() * 100}%`;
+
+            flake.style.animationDuration =
+                `${5 + Math.random() * 7}s`;
+
+            flake.style.animationDelay =
+                `${Math.random() * 5}s`;
+
+            snow.appendChild(
+                flake
+            );
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   PULSE
+   ========================================================= */
+
+function pulseLatest(
+    className
+) {
+
+    const items =
+        document.querySelectorAll(
+            `.${className}.active`
+        );
+
+    if (
+        items.length === 0
+    )
+        return;
+
+    const target =
+        items[
+            items.length - 1
+        ];
+
+    target.classList.remove(
+        "highlight-pulse"
+    );
+
+    void target.offsetWidth;
+
+    target.classList.add(
+        "highlight-pulse"
+    );
+
+}
+
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+function resetGarden() {
+
+    flowerCount = 0;
+    treeCount = 0;
+    butterflyCount = 0;
+    birdCount = 0;
+    cloudCount = 0;
+
+    dogCount = 0;
+    catCount = 0;
+    manCount = 0;
+    womanCount = 0;
+    humanCount = 0;
+
+    isNight = false;
+
+    rainbowActive = false;
+
+    snowActive = false;
+
+    starsManuallyVisible = false;
+
+
+    document.body.classList.remove(
+        "night"
+    );
+
+
+    document
+        .querySelectorAll(
+            `
+            .flower-item,
+            .tree-item,
+            .butterfly-item,
+            .bird-item,
+            .cloud-item,
+            .creature
+            `
+        )
+        .forEach(el => {
+
+            el.classList.remove(
+                "active",
+                "highlight-pulse"
+            );
+
+        });
+
+
+    document
+        .getElementById(
+            "house-obj"
+        )
+        .classList.remove(
+            "active"
+        );
+
+
+    document
+        .getElementById(
+            "rain-layer"
+        )
+        .classList.remove(
+            "active"
+        );
+
+
+    document
+        .getElementById(
+            "snow-layer"
+        )
+        .classList.remove(
+            "active"
+        );
+
+
+    document
+        .getElementById(
+            "river-zone"
+        )
+        .classList.remove(
             "visible"
         );
 
-        guideText.textContent =
-            "Your garden is peaceful again.";
 
-        tone(
-            523,
-            .18,
-            .02
+    document
+        .getElementById(
+            "boat-obj"
+        )
+        .classList.remove(
+            "active"
         );
 
+
+    document
+        .getElementById(
+            "rainbow-obj"
+        )
+        .classList.remove(
+            "active"
+        );
+
+
+    document
+        .getElementById(
+            "stars-container"
+        )
+        .classList.remove(
+            "manual-visible"
+        );
+
+
+    updateStatus(
+        "Garden reset"
+    );
+
+
+    setTimeout(() => {
+
+        updateStatus(
+            isListening
+                ? "Listening..."
+                : "Microphone off"
+        );
+
+    }, 1200);
+
+}
+
+
+/* =========================================================
+   UI EVENTS
+   ========================================================= */
+
+window.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        initGardenElements();
+
+        setupSpeechRecognition();
+
+
+        /* Microphone */
+
+        document
+            .getElementById(
+                "mic-btn"
+            )
+            .addEventListener(
+                "click",
+                () => {
+
+                    initAudio();
+
+                    if (
+                        isListening
+                    ) {
+
+                        stopRecognition();
+
+                    } else {
+
+                        startRecognition();
+
+                    }
+
+                }
+            );
+
+
+        /* Music */
+
+        document
+            .getElementById(
+                "music-btn"
+            )
+            .addEventListener(
+                "click",
+                () => {
+
+                    if (
+                        isMusicPlaying
+                    ) {
+
+                        stopBackgroundMusic();
+
+                    } else {
+
+                        startBackgroundMusic();
+
+                    }
+
+                }
+            );
+
+
+        /* Reset */
+
+        document
+            .getElementById(
+                "reset-btn"
+            )
+            .addEventListener(
+                "click",
+                () => {
+
+                    initAudio();
+
+                    resetGarden();
+
+                }
+            );
+
+
+        /* Welcome */
+
         setTimeout(
-            ()=>{
-                tone(
-                    659,
-                    .22,
-                    .018
-                );
-            },
-            100
+            speakWelcome,
+            500
         );
 
     }
