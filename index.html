@@ -1,1652 +1,939 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
 <meta charset="UTF-8">
 
 <meta name="viewport"
       content="width=device-width,
-               initial-scale=1.0,
-               maximum-scale=1.0,
-               user-scalable=no">
-
-<meta name="theme-color" content="#8fd3a8">
+      initial-scale=1.0,
+      maximum-scale=1.0,
+      user-scalable=no,
+      viewport-fit=cover">
 
 <title>Whispering Garden</title>
 
 <style>
-
-/* =========================================================
-   RESET
-========================================================= */
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    -webkit-tap-highlight-color:transparent;
+    user-select:none;
 }
 
-html,
-body {
-
-    width: 100%;
-    height: 100%;
-
-    overflow: hidden;
-
-    font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family:Arial,Helvetica,sans-serif;
+    background:#bde7ff;
 }
 
-
-/* =========================================================
-   MAIN WORLD
-========================================================= */
-
-#world {
-
-    position: relative;
-
-    width: 100vw;
-    height: 100dvh;
-
-    min-height: 500px;
-
-    overflow: hidden;
-
-    background:
-        linear-gradient(
-            to bottom,
-            #79cfee 0%,
-            #a9e5f7 42%,
-            #d8f2e9 62%,
-            #91d36d 63%,
-            #65b64f 100%
-        );
-
-    transition:
-        background 1.5s ease;
+body{
+    touch-action:none;
 }
 
+/* =========================
+   WORLD
+========================= */
 
-#world.night {
-
-    background:
-        linear-gradient(
-            to bottom,
-            #07162f 0%,
-            #132c54 42%,
-            #314968 62%,
-            #376044 63%,
-            #25462f 100%
-        );
+#world{
+    position:relative;
+    width:100vw;
+    height:100dvh;
+    min-height:520px;
+    overflow:hidden;
+    background:linear-gradient(
+        to bottom,
+        #8ed8ff 0%,
+        #bcecff 52%,
+        #dff6c9 53%,
+        #9bd47c 100%
+    );
 }
 
-
-/* =========================================================
+/* =========================
    SKY
-========================================================= */
+========================= */
 
-.sky {
-
-    position: absolute;
-
-    inset: 0;
-
-    pointer-events: none;
+.sky{
+    position:absolute;
+    inset:0 0 45% 0;
+    pointer-events:none;
 }
 
+/* Sun */
 
-/* =========================================================
-   SUN
-========================================================= */
-
-.sun {
-
-    position: absolute;
-
-    width: clamp(58px, 13vw, 92px);
-    height: clamp(58px, 13vw, 92px);
-
-    right: 8vw;
-    top: 13vh;
-
-    border-radius: 50%;
-
-    background:
-        radial-gradient(
-            circle,
-            #fff9a5 0%,
-            #ffe96b 55%,
-            #ffd84d 100%
-        );
-
+.sun{
+    position:absolute;
+    top:8%;
+    right:7%;
+    width:clamp(55px,12vw,95px);
+    height:clamp(55px,12vw,95px);
+    border-radius:50%;
+    background:#ffd95c;
     box-shadow:
-        0 0 25px #ffe66d,
-        0 0 60px rgba(255,230,100,.65);
-
-    transition:
-        opacity 1s ease,
-        transform 1s ease;
+        0 0 30px rgba(255,220,80,.55),
+        0 0 70px rgba(255,220,80,.25);
+    transition:.8s ease;
 }
 
-
-#world.night .sun {
-
-    opacity: 0;
-
-    transform: scale(.6);
+.sun.hidden{
+    opacity:0;
+    transform:scale(.5);
 }
 
+/* Moon */
 
-/* =========================================================
-   MOON
-========================================================= */
-
-.moon {
-
-    position: absolute;
-
-    width: clamp(55px, 12vw, 82px);
-    height: clamp(55px, 12vw, 82px);
-
-    right: 9vw;
-    top: 13vh;
-
-    border-radius: 50%;
-
-    background: #fffde7;
-
-    box-shadow:
-        0 0 20px rgba(255,255,255,.8),
-        0 0 55px rgba(255,255,255,.35);
-
-    opacity: 0;
-
-    transition:
-        opacity 1s ease;
+.moon{
+    position:absolute;
+    top:8%;
+    right:8%;
+    width:clamp(50px,11vw,82px);
+    height:clamp(50px,11vw,82px);
+    border-radius:50%;
+    background:#f7f3d0;
+    box-shadow:0 0 35px rgba(255,255,220,.7);
+    opacity:0;
+    transform:scale(.5);
+    transition:.8s ease;
 }
 
-
-#world.night .moon {
-
-    opacity: 1;
+.moon.visible{
+    opacity:1;
+    transform:scale(1);
 }
 
-
-/* =========================================================
-   STARS
-========================================================= */
-
-.stars {
-
-    position: absolute;
-
-    inset: 0;
-
-    opacity: 0;
-
-    transition: opacity 1s ease;
+.moon:after{
+    content:"";
+    position:absolute;
+    width:100%;
+    height:100%;
+    border-radius:50%;
+    background:#8ed8ff;
+    left:18px;
+    top:-7px;
 }
 
+/* Clouds */
 
-#world.night .stars {
-
-    opacity: 1;
+.sky-cloud{
+    position:absolute;
+    width:clamp(75px,15vw,140px);
+    height:35px;
+    background:white;
+    border-radius:50px;
+    opacity:.82;
 }
 
-
-.star {
-
-    position: absolute;
-
-    width: 3px;
-    height: 3px;
-
-    border-radius: 50%;
-
-    background: white;
-
-    box-shadow:
-        0 0 7px white;
-
-    animation:
-        twinkle 3s ease-in-out infinite;
+.sky-cloud:before,
+.sky-cloud:after{
+    content:"";
+    position:absolute;
+    background:white;
+    border-radius:50%;
 }
 
-
-@keyframes twinkle {
-
-    0%,
-    100% {
-        opacity: .3;
-    }
-
-    50% {
-        opacity: 1;
-    }
+.sky-cloud:before{
+    width:45px;
+    height:45px;
+    left:18px;
+    top:-22px;
 }
 
-
-/* =========================================================
-   CLOUDS
-========================================================= */
-
-.sky-cloud {
-
-    position: absolute;
-
-    width: 110px;
-    height: 35px;
-
-    border-radius: 30px;
-
-    background:
-        rgba(255,255,255,.85);
-
-    opacity: .78;
-
-    animation:
-        slowCloud 35s linear infinite;
+.sky-cloud:after{
+    width:55px;
+    height:55px;
+    right:15px;
+    top:-28px;
 }
 
-
-.sky-cloud::before {
-
-    content: "";
-
-    position: absolute;
-
-    width: 45px;
-    height: 45px;
-
-    left: 18px;
-    top: -20px;
-
-    border-radius: 50%;
-
-    background: inherit;
+.cloud1{
+    top:13%;
+    left:7%;
 }
 
-
-.sky-cloud::after {
-
-    content: "";
-
-    position: absolute;
-
-    width: 55px;
-    height: 55px;
-
-    right: 15px;
-    top: -25px;
-
-    border-radius: 50%;
-
-    background: inherit;
+.cloud2{
+    top:23%;
+    left:37%;
+    transform:scale(.75);
 }
 
-
-.sky-cloud.cloud1 {
-
-    left: 5%;
-    top: 17%;
-
-    animation-delay: -5s;
+.cloud3{
+    top:11%;
+    left:63%;
+    transform:scale(.62);
 }
 
+/* Stars */
 
-.sky-cloud.cloud2 {
-
-    left: 42%;
-    top: 25%;
-
-    transform: scale(.72);
-
-    animation-delay: -17s;
+#stars{
+    position:absolute;
+    inset:0;
+    opacity:0;
+    transition:.8s;
 }
 
-
-.sky-cloud.cloud3 {
-
-    left: 72%;
-    top: 18%;
-
-    transform: scale(.6);
-
-    animation-delay: -27s;
+.star{
+    position:absolute;
+    width:3px;
+    height:3px;
+    border-radius:50%;
+    background:white;
+    box-shadow:0 0 7px white;
 }
 
-
-@keyframes slowCloud {
-
-    0% {
-        transform:
-            translateX(-20vw);
-    }
-
-    100% {
-        transform:
-            translateX(120vw);
-    }
-}
-
-
-/* =========================================================
+/* =========================
    GROUND
-========================================================= */
+========================= */
 
-.ground {
-
-    position: absolute;
-
-    left: 0;
-    right: 0;
-    bottom: 0;
-
-    height: 38%;
-
+.ground{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    height:47%;
     background:
-
         radial-gradient(
-            circle at 10% 20%,
-            rgba(255,255,255,.15) 0 2px,
-            transparent 3px
-        ),
-
-        radial-gradient(
-            circle at 70% 40%,
+            circle at 20% 20%,
             rgba(255,255,255,.12) 0 2px,
             transparent 3px
         ),
-
         linear-gradient(
             to bottom,
-            #8bd267,
-            #4f9f3e
+            #a7dc86,
+            #7fc66d
         );
-
-    pointer-events: none;
 }
 
+/* Grass strips */
 
-/* =========================================================
+.grass-line{
+    position:absolute;
+    bottom:0;
+    height:6px;
+    background:#69ad58;
+    border-radius:50%;
+    opacity:.5;
+}
+
+.gl1{
+    left:5%;
+    width:20%;
+}
+
+.gl2{
+    left:40%;
+    width:24%;
+}
+
+.gl3{
+    right:4%;
+    width:22%;
+}
+
+/* =========================
    RIVER
-   FIXED POSITION
-========================================================= */
+   HIDDEN INITIALLY
+========================= */
 
-.river {
-
-    position: absolute;
-
-    left: 50%;
-
-    bottom: -7%;
-
-    width: 32vw;
-
-    min-width: 150px;
-    max-width: 230px;
-
-    height: 38vh;
-
-    min-height: 190px;
-
-    transform:
-        translateX(-50%)
-        rotate(2deg);
-
+#river{
+    position:absolute;
+    width:42%;
+    height:30%;
+    left:29%;
+    bottom:-2%;
     background:
         linear-gradient(
-            90deg,
-            #4eb7e6,
-            #8ce0f4,
-            #55bde7
+            180deg,
+            #69c8ed,
+            #46aeda
         );
-
-    border-radius:
-        50% 50% 0 0;
-
-    overflow: hidden;
-
+    border-radius:48% 48% 0 0;
     box-shadow:
-        inset 0 8px 15px
-        rgba(255,255,255,.25);
+        inset 0 10px 0 rgba(255,255,255,.2),
+        inset 0 0 20px rgba(0,80,130,.12);
+    transform:scaleY(0);
+    transform-origin:bottom;
+    opacity:0;
+    transition:
+        transform .9s ease,
+        opacity .9s ease;
+    z-index:2;
 }
 
-
-.river::before,
-.river::after {
-
-    content: "";
-
-    position: absolute;
-
-    left: -10%;
-
-    width: 120%;
-    height: 7px;
-
-    border-top:
-        2px solid
-        rgba(255,255,255,.5);
-
-    border-radius: 50%;
-
-    animation:
-        riverWave 4s ease-in-out infinite;
+#river.visible{
+    transform:scaleY(1);
+    opacity:1;
 }
 
-
-.river::before {
-
-    top: 28%;
+.water-line{
+    position:absolute;
+    left:8%;
+    width:84%;
+    height:3px;
+    border-radius:50%;
+    background:rgba(255,255,255,.55);
+    animation:waterMove 3s ease-in-out infinite;
 }
 
+.w1{top:25%;}
+.w2{top:45%;animation-delay:.7s;}
+.w3{top:67%;animation-delay:1.2s;}
+.w4{top:83%;animation-delay:1.8s;}
 
-.river::after {
-
-    top: 60%;
-
-    animation-delay: -2s;
+@keyframes waterMove{
+    0%,100%{transform:translateX(-5px);opacity:.35}
+    50%{transform:translateX(5px);opacity:.75}
 }
 
+/* =========================
+   OBJECT LAYER
+========================= */
 
-@keyframes riverWave {
-
-    0%,
-    100% {
-        transform:
-            translateX(-5%);
-    }
-
-    50% {
-        transform:
-            translateX(5%);
-    }
+#objects{
+    position:absolute;
+    inset:0;
+    z-index:5;
 }
 
-
-/* =========================================================
-   OBJECT CONTAINER
-========================================================= */
-
-#objects {
-
-    position: absolute;
-
-    inset: 0;
-
-    pointer-events: none;
-}
-
-
-/* =========================================================
-   GENERAL OBJECT
-========================================================= */
-
-.garden-object {
-
-    position: absolute;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    pointer-events: none;
-
-    animation:
-        objectAppear .7s ease-out;
-}
-
-
-@keyframes objectAppear {
-
-    0% {
-
-        opacity: 0;
-
-        transform:
-            scale(.5);
-    }
-
-    70% {
-
-        transform:
-            scale(1.08);
-    }
-
-    100% {
-
-        opacity: 1;
-
-        transform:
-            scale(1);
-    }
-}
-
-
-/* =========================================================
+/* =========================
    FLOWERS
-   FIXED POSITIONS
-========================================================= */
+========================= */
 
-.flower {
-
-    width: 50px;
-    height: 50px;
-
-    font-size: 46px;
+.flower{
+    position:absolute;
+    font-size:clamp(32px,7vw,58px);
+    animation:bloom .6s ease;
+    filter:drop-shadow(0 4px 3px rgba(0,0,0,.15));
 }
 
+.f1{left:8%;bottom:13%}
+.f2{left:20%;bottom:22%}
+.f3{left:35%;bottom:10%}
+.f4{right:29%;bottom:13%}
+.f5{right:17%;bottom:23%}
+.f6{right:6%;bottom:12%}
 
-.flower.f1 {
-
-    left: 8%;
-    bottom: 15%;
+@keyframes bloom{
+    0%{
+        transform:scale(0);
+        opacity:0;
+    }
+    70%{
+        transform:scale(1.15);
+    }
+    100%{
+        transform:scale(1);
+        opacity:1;
+    }
 }
 
-
-.flower.f2 {
-
-    left: 20%;
-    bottom: 13%;
-}
-
-
-.flower.f3 {
-
-    left: 31%;
-    bottom: 17%;
-}
-
-
-.flower.f4 {
-
-    right: 31%;
-    bottom: 17%;
-}
-
-
-.flower.f5 {
-
-    right: 19%;
-    bottom: 13%;
-}
-
-
-.flower.f6 {
-
-    right: 7%;
-    bottom: 15%;
-}
-
-
-/* =========================================================
+/* =========================
    TREES
-   FIXED SIDE POSITIONS
-========================================================= */
+========================= */
 
-.tree {
-
-    width: 95px;
-    height: 110px;
-
-    font-size: 90px;
+.tree{
+    position:absolute;
+    font-size:clamp(55px,12vw,105px);
+    filter:drop-shadow(0 6px 5px rgba(0,0,0,.15));
+    animation:treeAppear .7s ease;
 }
 
-
-.tree.t1 {
-
-    left: 1%;
-    bottom: 15%;
+.t1{
+    left:2%;
+    bottom:28%;
 }
 
-
-.tree.t2 {
-
-    left: 9%;
-    bottom: 23%;
-
-    transform: scale(.72);
+.t2{
+    left:14%;
+    bottom:34%;
 }
 
-
-.tree.t3 {
-
-    right: 1%;
-    bottom: 15%;
+.t3{
+    right:3%;
+    bottom:29%;
 }
 
-
-.tree.t4 {
-
-    right: 9%;
-    bottom: 23%;
-
-    transform: scale(.72);
+.t4{
+    right:15%;
+    bottom:36%;
 }
 
+@keyframes treeAppear{
+    from{
+        opacity:0;
+        transform:translateY(20px) scale(.7);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0) scale(1);
+    }
+}
 
-/* =========================================================
+/* =========================
    HOUSE
-   FIXED CENTER
-========================================================= */
+   FIXED ON LEFT-MIDDLE LAND
+========================= */
 
-.house {
-
-    left: 50%;
-
-    bottom: 18%;
-
-    width: 110px;
-    height: 110px;
-
-    font-size: 100px;
-
-    transform:
-        translateX(-50%);
+.house{
+    position:absolute;
+    left:39%;
+    bottom:30%;
+    width:clamp(100px,20vw,180px);
+    height:clamp(80px,15vw,130px);
+    background:#f3c27a;
+    border:4px solid #b87948;
+    border-radius:8px;
+    animation:houseAppear .7s ease;
 }
 
+/* roof */
 
-/* =========================================================
-   BUTTERFLIES
-========================================================= */
-
-.butterfly {
-
-    width: 45px;
-    height: 45px;
-
-    font-size: 40px;
-
-    animation:
-        butterflyFloat
-        4s ease-in-out infinite;
+.house:before{
+    content:"";
+    position:absolute;
+    left:-18%;
+    top:-48%;
+    width:136%;
+    height:75%;
+    background:#c95e52;
+    clip-path:polygon(50% 0,100% 100%,0 100%);
 }
 
+/* door */
 
-.butterfly.b1 {
-
-    left: 19%;
-    bottom: 31%;
+.house:after{
+    content:"";
+    position:absolute;
+    width:24%;
+    height:48%;
+    bottom:0;
+    left:38%;
+    background:#87543c;
+    border-radius:6px 6px 0 0;
 }
 
-
-.butterfly.b2 {
-
-    left: 30%;
-    bottom: 38%;
+.house-window{
+    position:absolute;
+    width:23%;
+    height:27%;
+    background:#8edff4;
+    border:3px solid #765442;
+    top:27%;
 }
 
+.hw1{left:10%}
+.hw2{right:10%}
 
-.butterfly.b3 {
-
-    right: 28%;
-    bottom: 35%;
-}
-
-
-.butterfly.b4 {
-
-    right: 18%;
-    bottom: 29%;
-}
-
-
-@keyframes butterflyFloat {
-
-    0%,
-    100% {
-        transform:
-            translateY(0);
+@keyframes houseAppear{
+    from{
+        opacity:0;
+        transform:scale(.7);
     }
-
-    50% {
-        transform:
-            translateY(-10px);
+    to{
+        opacity:1;
+        transform:scale(1);
     }
 }
 
+/* =========================
+   BUTTERFLY
+========================= */
 
-/* =========================================================
+.butterfly{
+    position:absolute;
+    font-size:clamp(30px,6vw,52px);
+    animation:flyButterfly 4s ease-in-out infinite;
+}
+
+.b1{
+    left:27%;
+    bottom:33%;
+}
+
+.b2{
+    right:24%;
+    bottom:31%;
+    animation-delay:1.5s;
+}
+
+@keyframes flyButterfly{
+    0%,100%{
+        transform:translate(0,0) rotate(-5deg);
+    }
+    50%{
+        transform:translate(18px,-16px) rotate(5deg);
+    }
+}
+
+/* =========================
    BIRDS
-========================================================= */
+========================= */
 
-.bird {
-
-    width: 45px;
-    height: 45px;
-
-    font-size: 38px;
-
-    animation:
-        birdFloat 5s ease-in-out infinite;
+.bird{
+    position:absolute;
+    font-size:clamp(30px,6vw,55px);
+    animation:birdFly 5s ease-in-out infinite;
 }
 
-
-.bird.b1 {
-
-    left: 23%;
-    top: 20%;
+.bird1{
+    left:17%;
+    top:22%;
 }
 
-
-.bird.b2 {
-
-    left: 46%;
-    top: 15%;
+.bird2{
+    left:52%;
+    top:17%;
+    animation-delay:1.5s;
 }
 
-
-.bird.b3 {
-
-    right: 23%;
-    top: 22%;
-}
-
-
-@keyframes birdFloat {
-
-    0%,
-    100% {
-        transform:
-            translate(0,0);
+@keyframes birdFly{
+    0%,100%{
+        transform:translateX(0);
     }
-
-    50% {
-        transform:
-            translate(8px,-7px);
+    50%{
+        transform:translateX(35px) translateY(-8px);
     }
 }
 
+/* =========================
+   CLOUD COMMAND OBJECTS
+========================= */
 
-/* =========================================================
-   CLOUD OBJECTS
-========================================================= */
-
-.cloud-object {
-
-    width: 65px;
-    height: 45px;
-
-    font-size: 60px;
+.command-cloud{
+    position:absolute;
+    font-size:clamp(45px,9vw,75px);
+    animation:cloudFloat 5s ease-in-out infinite;
 }
 
-
-.cloud-object.c1 {
-
-    left: 13%;
-    top: 30%;
+.cc1{
+    left:29%;
+    top:12%;
 }
 
-
-.cloud-object.c2 {
-
-    left: 42%;
-    top: 25%;
+.cc2{
+    right:25%;
+    top:25%;
+    animation-delay:1.2s;
 }
 
-
-.cloud-object.c3 {
-
-    right: 12%;
-    top: 31%;
+@keyframes cloudFloat{
+    0%,100%{transform:translateX(0)}
+    50%{transform:translateX(15px)}
 }
 
-
-/* =========================================================
+/* =========================
    BOAT
-========================================================= */
+========================= */
 
-.boat {
-
-    left: 50%;
-
-    bottom: 11%;
-
-    width: 65px;
-    height: 55px;
-
-    font-size: 54px;
-
-    transform:
-        translateX(-50%);
+.boat{
+    position:absolute;
+    left:50%;
+    bottom:9%;
+    transform:translateX(-50%);
+    font-size:clamp(40px,8vw,65px);
+    animation:boatFloat 3s ease-in-out infinite;
 }
 
+@keyframes boatFloat{
+    0%,100%{transform:translateX(-50%) translateY(0)}
+    50%{transform:translateX(-50%) translateY(-4px)}
+}
 
-/* =========================================================
+/* =========================
    RAIN
-========================================================= */
+========================= */
 
-#rain {
-
-    position: absolute;
-
-    inset: 0;
-
-    pointer-events: none;
-
-    opacity: 0;
-
-    transition:
-        opacity .5s ease;
-
-    z-index: 30;
+#rain{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    z-index:20;
+    opacity:0;
+    transition:.4s;
 }
 
-
-#rain.active {
-
-    opacity: 1;
+#rain.visible{
+    opacity:1;
 }
 
-
-.raindrop {
-
-    position: absolute;
-
-    width: 2px;
-    height: 18px;
-
-    border-radius: 5px;
-
-    background:
-        rgba(80,170,240,.65);
-
-    animation:
-        rainFall 1s linear infinite;
+.raindrop{
+    position:absolute;
+    width:2px;
+    height:20px;
+    background:rgba(255,255,255,.65);
+    animation:rainFall linear infinite;
 }
 
-
-@keyframes rainFall {
-
-    from {
-        transform:
-            translateY(-30px);
+@keyframes rainFall{
+    from{
+        transform:translateY(-30px);
     }
-
-    to {
-        transform:
-            translateY(110vh);
+    to{
+        transform:translateY(110vh);
     }
 }
 
-
-/* =========================================================
+/* =========================
    TOP UI
-========================================================= */
+========================= */
 
-.top-ui {
-
-    position: absolute;
-
-    top: 12px;
-    left: 50%;
-
-    width: calc(100% - 24px);
-
-    max-width: 620px;
-
-    transform:
-        translateX(-50%);
-
-    display: flex;
-
-    justify-content:
-        space-between;
-
-    align-items:
-        center;
-
-    gap: 8px;
-
-    z-index: 100;
+.topbar{
+    position:absolute;
+    z-index:50;
+    top:env(safe-area-inset-top,10px);
+    left:0;
+    right:0;
+    padding:12px 16px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    pointer-events:none;
 }
 
+.title{
+    color:white;
+    font-size:clamp(18px,5vw,30px);
+    font-weight:700;
+    text-shadow:0 2px 4px rgba(0,0,0,.2);
+}
 
-.title-card {
+.music-status{
+    background:rgba(255,255,255,.75);
+    padding:7px 11px;
+    border-radius:20px;
+    font-size:12px;
+    color:#37634a;
+}
 
-    padding:
-        8px 13px;
+/* =========================
+   GUIDE
+========================= */
 
-    border-radius:
-        18px;
+.guide{
+    position:absolute;
+    z-index:60;
+    top:clamp(55px,10vh,90px);
+    left:50%;
+    transform:translateX(-50%);
+    width:min(90%,560px);
+    background:rgba(255,255,255,.92);
+    border-radius:18px;
+    padding:12px 15px;
+    text-align:center;
+    box-shadow:0 8px 25px rgba(0,0,0,.12);
+}
 
-    background:
-        rgba(255,255,255,.9);
+.guide-title{
+    font-weight:bold;
+    color:#47775a;
+    font-size:14px;
+}
 
-    backdrop-filter:
-        blur(10px);
+.guide-text{
+    margin-top:4px;
+    color:#425449;
+    font-size:clamp(12px,3.2vw,15px);
+    line-height:1.4;
+}
 
+/* =========================
+   CONTROLS
+========================= */
+
+.controls{
+    position:absolute;
+    z-index:70;
+    left:50%;
+    transform:translateX(-50%);
+    bottom:10px;
+    width:min(94%,600px);
+    display:flex;
+    justify-content:center;
+    gap:10px;
+}
+
+button{
+    border:0;
+    border-radius:18px;
+    padding:12px 18px;
+    font-size:14px;
+    font-weight:bold;
+    cursor:pointer;
+    box-shadow:0 5px 15px rgba(0,0,0,.14);
+}
+
+.voice-btn{
+    background:#ffffff;
+    color:#427455;
+}
+
+.voice-btn.listening{
+    background:#e5f7dc;
     box-shadow:
-        0 4px 18px
-        rgba(0,0,0,.1);
+        0 0 0 4px rgba(100,190,110,.2),
+        0 5px 15px rgba(0,0,0,.14);
 }
 
-
-.title-card h1 {
-
-    font-size: 16px;
-
-    color: #2c6b3d;
+.reset-btn{
+    background:#f7e4c6;
+    color:#735638;
 }
 
-
-.title-card span {
-
-    font-size: 9px;
-
-    color: #66806d;
-}
-
-
-.music-indicator {
-
-    padding:
-        8px 11px;
-
-    border-radius:
-        18px;
-
-    background:
-        rgba(255,255,255,.9);
-
-    color: #39744a;
-
-    font-size: 10px;
-
-    box-shadow:
-        0 4px 15px
-        rgba(0,0,0,.08);
-}
-
-
-/* =========================================================
-   VOICE GUIDE
-========================================================= */
-
-.assistant-card {
-
-    position: absolute;
-
-    top: 72px;
-
-    left: 50%;
-
-    width:
-        min(
-            calc(100% - 30px),
-            500px
-        );
-
-    transform:
-        translateX(-50%);
-
-    padding:
-        11px 15px;
-
-    border-radius:
-        19px;
-
-    background:
-        rgba(255,255,255,.94);
-
-    backdrop-filter:
-        blur(12px);
-
-    text-align:
-        center;
-
-    box-shadow:
-        0 7px 25px
-        rgba(0,0,0,.1);
-
-    z-index: 100;
-}
-
-
-.assistant-icon {
-
-    font-size: 22px;
-
-    margin-bottom: 2px;
-}
-
-
-.assistant-title {
-
-    font-size: 9px;
-
-    font-weight: bold;
-
-    color: #4a8760;
-
-    margin-bottom: 3px;
-}
-
-
-#assistantMessage {
-
-    font-size: 13px;
-
-    line-height: 1.35;
-
-    color: #34533d;
-}
-
-
-/* =========================================================
-   COMMAND PILLS
-========================================================= */
-
-.commands {
-
-    position: absolute;
-
-    left: 50%;
-    bottom: 9px;
-
-    width:
-        calc(100% - 20px);
-
-    transform:
-        translateX(-50%);
-
-    display: flex;
-
-    flex-wrap: wrap;
-
-    justify-content: center;
-
-    gap: 5px;
-
-    z-index: 100;
-}
-
-
-.command-pill {
-
-    padding:
-        6px 9px;
-
-    border-radius:
-        15px;
-
-    background:
-        rgba(255,255,255,.9);
-
-    color: #3c7049;
-
-    font-size: 9px;
-
-    box-shadow:
-        0 3px 10px
-        rgba(0,0,0,.08);
-
-    transition:
-        .3s ease;
-}
-
-
-.command-pill.active {
-
-    background:
-        #fff0a5;
-
-    transform:
-        scale(1.12);
-
-    box-shadow:
-        0 0 15px
-        rgba(255,220,70,.55);
-}
-
-
-/* =========================================================
-   CONTROL BUTTONS
-========================================================= */
-
-.controls {
-
-    position: absolute;
-
-    right: 12px;
-    bottom: 75px;
-
-    display: flex;
-
-    flex-direction: column;
-
-    gap: 8px;
-
-    z-index: 150;
-}
-
-
-.control-button {
-
-    width: 44px;
-    height: 44px;
-
-    border-radius: 50%;
-
-    background:
-        rgba(255,255,255,.95);
-
-    box-shadow:
-        0 4px 15px
-        rgba(0,0,0,.13);
-
-    font-size: 18px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-}
-
-
-.voice-button.listening {
-
-    background:
-        #ddf6df;
-
-    box-shadow:
-        0 0 0 5px
-        rgba(90,190,100,.12),
-
-        0 0 22px
-        rgba(90,190,100,.4);
-}
-
-
-/* =========================================================
+/* =========================
    START SCREEN
-========================================================= */
+========================= */
 
-.start-panel {
-
-    position: absolute;
-
-    inset: 0;
-
-    z-index: 500;
-
-    display: flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        center;
-
-    background:
-        rgba(120,200,150,.16);
-
-    backdrop-filter:
-        blur(3px);
-
-    transition:
-        opacity .5s ease,
-        visibility .5s ease;
-}
-
-
-.start-panel.hidden {
-
-    opacity: 0;
-
-    visibility:
-        hidden;
-}
-
-
-.start-box {
-
-    width:
-        min(
-            calc(100% - 40px),
-            410px
-        );
-
-    padding:
-        25px 20px;
-
-    border-radius:
-        28px;
-
-    background:
-        rgba(255,255,255,.96);
-
-    text-align:
-        center;
-
-    box-shadow:
-        0 20px 55px
-        rgba(0,0,0,.18);
-}
-
-
-.start-icon {
-
-    font-size: 55px;
-
-    margin-bottom: 4px;
-}
-
-
-.start-box h2 {
-
-    font-size: 23px;
-
-    color: #2d7040;
-
-    margin-bottom: 8px;
-}
-
-
-.start-box p {
-
-    color: #637668;
-
-    font-size: 13px;
-
-    line-height: 1.5;
-
-    margin-bottom: 7px;
-}
-
-
-.start-button {
-
-    margin-top: 10px;
-
-    padding:
-        13px 23px;
-
-    border-radius:
-        25px;
-
+#startScreen{
+    position:absolute;
+    inset:0;
+    z-index:100;
     background:
         linear-gradient(
-            135deg,
-            #67c970,
-            #48a95b
-        );
-
-    color: white;
-
-    font-size: 15px;
-
-    font-weight: bold;
-
-    box-shadow:
-        0 6px 18px
-        rgba(70,170,90,.3);
+            rgba(72,139,88,.42),
+            rgba(75,139,95,.32)
+        ),
+        #b9e6b0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:25px;
 }
 
-
-/* =========================================================
-   SMALL PHONES
-========================================================= */
-
-@media(max-width:380px) {
-
-    .assistant-card {
-
-        top: 67px;
-
-        padding:
-            8px 11px;
-    }
-
-    .assistant-icon {
-
-        font-size: 19px;
-    }
-
-    #assistantMessage {
-
-        font-size: 11px;
-    }
-
-    .flower {
-
-        font-size: 39px;
-    }
-
-    .tree {
-
-        font-size: 72px;
-    }
-
-    .house {
-
-        font-size: 82px;
-    }
-
-    .butterfly {
-
-        font-size: 34px;
-    }
-
-    .bird {
-
-        font-size: 31px;
-    }
-
-    .command-pill {
-
-        padding:
-            5px 7px;
-
-        font-size: 8px;
-    }
+.start-card{
+    width:min(92%,460px);
+    background:rgba(255,255,255,.96);
+    border-radius:25px;
+    padding:30px 22px;
+    text-align:center;
+    box-shadow:0 15px 45px rgba(0,0,0,.2);
 }
 
+.start-card h1{
+    color:#47775a;
+    font-size:clamp(25px,7vw,40px);
+    margin-bottom:10px;
+}
 
-/* =========================================================
-   LANDSCAPE PHONE
-========================================================= */
+.start-card p{
+    color:#52645a;
+    line-height:1.6;
+    font-size:14px;
+    margin-bottom:22px;
+}
 
-@media(
-    max-height:550px
-) {
+.start-btn{
+    background:#76bd72;
+    color:white;
+    font-size:17px;
+    padding:14px 28px;
+    border-radius:20px;
+}
 
-    .assistant-card {
+/* =========================
+   MOBILE
+========================= */
 
-        top: 57px;
+@media(max-width:600px){
 
-        padding:
-            7px 12px;
+    #world{
+        min-height:500px;
     }
 
-    #assistantMessage {
-
-        font-size: 11px;
+    .guide{
+        top:68px;
+        padding:9px 12px;
     }
 
-    .commands {
-
-        bottom: 5px;
+    .guide-text{
+        font-size:12px;
     }
 
-    .controls {
-
-        bottom: 55px;
+    .house{
+        left:39%;
+        bottom:30%;
     }
 
-    .ground {
+    .tree{
+        font-size:58px;
+    }
 
-        height: 40%;
+    .flower{
+        font-size:35px;
+    }
+
+    .controls{
+        bottom:7px;
+    }
+
+    button{
+        padding:11px 15px;
+        font-size:13px;
     }
 }
 
+/* Small phones */
+
+@media(max-width:380px){
+
+    .guide{
+        top:63px;
+    }
+
+    .guide-text{
+        font-size:11px;
+    }
+
+    .house{
+        width:95px;
+        height:75px;
+        bottom:31%;
+    }
+
+    .tree{
+        font-size:50px;
+    }
+
+    .flower{
+        font-size:30px;
+    }
+
+    .controls{
+        gap:6px;
+    }
+
+    button{
+        padding:9px 12px;
+        font-size:12px;
+    }
+}
+
+/* Landscape phone */
+
+@media(max-height:500px){
+
+    .guide{
+        top:50px;
+        padding:7px 10px;
+    }
+
+    .guide-text{
+        display:none;
+    }
+
+    .controls{
+        bottom:5px;
+    }
+}
 </style>
 </head>
-
 
 <body>
 
 <div id="world">
 
-
-    <!-- =====================================================
-         SKY
-    ====================================================== -->
-
+    <!-- SKY -->
     <div class="sky">
 
-        <div class="sun" id="sun"></div>
-
-        <div class="moon" id="moon"></div>
-
-        <div class="stars" id="stars"></div>
-
-
-        <!-- Natural background clouds -->
+        <div id="sun" class="sun"></div>
+        <div id="moon" class="moon"></div>
 
         <div class="sky-cloud cloud1"></div>
-
         <div class="sky-cloud cloud2"></div>
-
         <div class="sky-cloud cloud3"></div>
 
+        <div id="stars"></div>
+
     </div>
 
+    <!-- GROUND -->
+    <div class="ground">
 
-    <!-- =====================================================
-         GROUND
-    ====================================================== -->
+        <div class="grass-line gl1"></div>
+        <div class="grass-line gl2"></div>
+        <div class="grass-line gl3"></div>
 
-    <div class="ground"></div>
+    </div>
 
+    <!-- RIVER: HIDDEN UNTIL COMMAND -->
+    <div id="river">
+        <div class="water-line w1"></div>
+        <div class="water-line w2"></div>
+        <div class="water-line w3"></div>
+        <div class="water-line w4"></div>
+    </div>
 
-    <!-- =====================================================
-         RIVER
-    ====================================================== -->
-
-    <div class="river"></div>
-
-
-    <!-- =====================================================
-         RAIN
-    ====================================================== -->
-
+    <!-- RAIN -->
     <div id="rain"></div>
 
-
-    <!-- =====================================================
-         GARDEN OBJECTS
-    ====================================================== -->
-
+    <!-- OBJECTS -->
     <div id="objects"></div>
 
+    <!-- TOP -->
+    <div class="topbar">
 
-    <!-- =====================================================
-         TOP UI
-    ====================================================== -->
-
-    <div class="top-ui">
-
-        <div class="title-card">
-
-            <h1>
-                🌿 Whispering Garden
-            </h1>
-
-            <span>
-                Talk gently to your garden
-            </span>
-
+        <div class="title">
+            🌿 Whispering Garden
         </div>
 
-
-        <div
-            class="music-indicator"
-            id="musicIndicator"
-        >
-            🎵 Calm Music
+        <div class="music-status" id="musicStatus">
+            🎵 Calm garden
         </div>
 
     </div>
 
+    <!-- GUIDE -->
+    <div class="guide">
 
-    <!-- =====================================================
-         VOICE GUIDE
-    ====================================================== -->
-
-    <div class="assistant-card">
-
-        <div class="assistant-icon">
-            🌱
+        <div class="guide-title">
+            🌼 Garden Guide
         </div>
 
-        <div class="assistant-title">
-            YOUR GARDEN GUIDE
+        <div class="guide-text" id="guideText">
+            Press Begin Garden to start.
         </div>
-
-        <p id="assistantMessage">
-            Your peaceful garden is ready.
-        </p>
 
     </div>
 
-
-    <!-- =====================================================
-         CONTROLS
-    ====================================================== -->
-
+    <!-- CONTROLS -->
     <div class="controls">
 
         <button
-            class="control-button voice-button"
             id="voiceButton"
-            aria-label="Voice"
-        >
-            🎤
+            class="voice-btn">
+            🎙️ Speak
         </button>
-
 
         <button
-            class="control-button"
             id="resetButton"
-            aria-label="Reset"
-        >
-            🔄
+            class="reset-btn">
+            🌱 Reset
         </button>
 
     </div>
 
+    <!-- START SCREEN -->
+    <div id="startScreen">
 
-    <!-- =====================================================
-         COMMANDS
-    ====================================================== -->
+        <div class="start-card">
 
-    <div class="commands">
-
-        <div
-            class="command-pill"
-            data-command="flower"
-        >
-            🌸 Flower
-        </div>
-
-        <div
-            class="command-pill"
-            data-command="tree"
-        >
-            🌳 Tree
-        </div>
-
-        <div
-            class="command-pill"
-            data-command="house"
-        >
-            🏠 House
-        </div>
-
-        <div
-            class="command-pill"
-            data-command="butterfly"
-        >
-            🦋 Butterfly
-        </div>
-
-        <div
-            class="command-pill"
-            data-command="bird"
-        >
-            🐦 Bird
-        </div>
-
-        <div
-            class="command-pill"
-            data-command="cloud"
-        >
-            ☁️ Cloud
-        </div>
-
-        <div
-            class="command-pill"
-            data-command="rain"
-        >
-            🌧️ Rain
-        </div>
-
-        <div
-            class="command-pill"
-            data-command="river"
-        >
-            🌊 River
-        </div>
-
-        <div
-            class="command-pill"
-            data-command="boat"
-        >
-            🚤 Boat
-        </div>
-
-        <div
-            class="command-pill"
-            data-command="sun"
-        >
-            ☀️ Sun
-        </div>
-
-        <div
-            class="command-pill"
-            data-command="moon"
-        >
-            🌙 Moon
-        </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         START SCREEN
-    ====================================================== -->
-
-    <div
-        class="start-panel"
-        id="startPanel"
-    >
-
-        <div class="start-box">
-
-            <div class="start-icon">
-                🌳🌸🦋
-            </div>
-
-            <h2>
-                Welcome to Your Garden
-            </h2>
+            <h1>🌿 Whispering Garden</h1>
 
             <p>
-                This is your peaceful garden.
-                You can talk to it and create
-                your own little world.
-            </p>
-
-            <p>
-                Your garden guide will teach you
-                what you can say.
+                Listen to the garden guide first.
+                <br>
+                Then speak gently to grow your garden.
+                <br><br>
+                Say words such as
+                <b>flower, tree, house, bird, rain, river</b>
+                and more.
             </p>
 
             <button
-                class="start-button"
                 id="startButton"
-            >
-                🌱 Enter My Garden
+                class="start-btn">
+                🌱 Begin Garden
             </button>
 
         </div>
@@ -1655,87 +942,67 @@ body {
 
 </div>
 
-
 <script>
 
 /* =========================================================
    ELEMENTS
 ========================================================= */
 
-const world =
-    document.getElementById("world");
+const objects = document.getElementById("objects");
+const river = document.getElementById("river");
+const rain = document.getElementById("rain");
+const sun = document.getElementById("sun");
+const moon = document.getElementById("moon");
+const stars = document.getElementById("stars");
 
-const objects =
-    document.getElementById("objects");
+const startScreen = document.getElementById("startScreen");
+const startButton = document.getElementById("startButton");
 
-const rain =
-    document.getElementById("rain");
+const voiceButton = document.getElementById("voiceButton");
+const resetButton = document.getElementById("resetButton");
 
-const stars =
-    document.getElementById("stars");
-
-const assistantMessage =
-    document.getElementById("assistantMessage");
-
-const voiceButton =
-    document.getElementById("voiceButton");
-
-const resetButton =
-    document.getElementById("resetButton");
-
-const startButton =
-    document.getElementById("startButton");
-
-const startPanel =
-    document.getElementById("startPanel");
+const guideText = document.getElementById("guideText");
+const musicStatus = document.getElementById("musicStatus");
 
 
 /* =========================================================
-   AUDIO
+   AUDIO ENGINE
 ========================================================= */
 
 let audioContext = null;
-
+let musicTimer = null;
 let musicStarted = false;
 
-let musicTimer = null;
+function initAudio(){
 
-
-function initAudio() {
-
-    if (!audioContext) {
+    if(!audioContext){
 
         audioContext =
-            new (
-                window.AudioContext ||
-                window.webkitAudioContext
-            )();
+            new (window.AudioContext ||
+                 window.webkitAudioContext)();
+
     }
 
-    if (
-        audioContext.state ===
-        "suspended"
-    ) {
-
+    if(audioContext.state === "suspended"){
         audioContext.resume();
     }
 }
 
 
 /* =========================================================
-   GENTLE SOUND
+   BASIC TONE
 ========================================================= */
 
-function playTone(
+function tone(
     frequency,
-    duration = .3,
-    volume = .025
-) {
+    duration = 0.25,
+    volume = 0.03,
+    type = "sine"
+){
 
-    if (!audioContext) {
-        return;
-    }
+    if(!audioContext) return;
 
+    const now = audioContext.currentTime;
 
     const oscillator =
         audioContext.createOscillator();
@@ -1743,47 +1010,278 @@ function playTone(
     const gain =
         audioContext.createGain();
 
+    oscillator.type = type;
+    oscillator.frequency.setValueAtTime(
+        frequency,
+        now
+    );
 
-    oscillator.type =
-        "sine";
+    gain.gain.setValueAtTime(
+        0.0001,
+        now
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        volume,
+        now + 0.02
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        now + duration
+    );
+
+    oscillator.connect(gain);
+    gain.connect(audioContext.destination);
+
+    oscillator.start(now);
+    oscillator.stop(now + duration + .03);
+}
 
 
-    oscillator.frequency.value =
-        frequency;
+/* =========================================================
+   FLOWER BLING
+========================================================= */
 
+function flowerBling(){
+
+    if(!audioContext) return;
+
+    tone(880,.18,.035,"sine");
+
+    setTimeout(()=>{
+        tone(1175,.22,.028,"sine");
+    },90);
+
+}
+
+
+/* =========================================================
+   BIRD CHIRPING
+========================================================= */
+
+function birdChirp(){
+
+    if(!audioContext) return;
+
+    const now =
+        audioContext.currentTime;
+
+    const oscillator =
+        audioContext.createOscillator();
+
+    const gain =
+        audioContext.createGain();
+
+    oscillator.type = "sine";
+
+    oscillator.frequency.setValueAtTime(
+        1300,
+        now
+    );
+
+    oscillator.frequency.exponentialRampToValueAtTime(
+        2100,
+        now + .12
+    );
+
+    oscillator.frequency.exponentialRampToValueAtTime(
+        1500,
+        now + .24
+    );
 
     gain.gain.setValueAtTime(
         .0001,
-        audioContext.currentTime
+        now
     );
 
-
-    gain.gain.linearRampToValueAtTime(
-        volume,
-        audioContext.currentTime + .08
+    gain.gain.exponentialRampToValueAtTime(
+        .035,
+        now + .03
     );
-
 
     gain.gain.exponentialRampToValueAtTime(
         .0001,
-        audioContext.currentTime + duration
+        now + .3
     );
-
 
     oscillator.connect(gain);
+    gain.connect(audioContext.destination);
 
-    gain.connect(
-        audioContext.destination
-    );
+    oscillator.start(now);
+    oscillator.stop(now + .32);
+
+    setTimeout(()=>{
+        tone(1900,.16,.025,"sine");
+    },220);
+}
 
 
-    oscillator.start();
+/* =========================================================
+   RIVER FLOWING SOUND
+========================================================= */
+
+let riverSoundTimer = null;
+
+function startRiverSound(){
+
+    if(!audioContext) return;
+
+    if(riverSoundTimer) return;
+
+    function waterPulse(){
+
+        if(!river.classList.contains("visible")){
+            riverSoundTimer = null;
+            return;
+        }
+
+        tone(
+            260 + Math.random()*90,
+            .35,
+            .008,
+            "sine"
+        );
+
+        riverSoundTimer =
+            setTimeout(
+                waterPulse,
+                500 + Math.random()*500
+            );
+    }
+
+    waterPulse();
+}
 
 
-    oscillator.stop(
-        audioContext.currentTime +
-        duration
-    );
+/* =========================================================
+   RAIN SOUND
+========================================================= */
+
+let rainSoundTimer = null;
+
+function startRainSound(){
+
+    if(!audioContext) return;
+
+    if(rainSoundTimer) return;
+
+    function rainDropSound(){
+
+        if(!rain.classList.contains("visible")){
+            rainSoundTimer = null;
+            return;
+        }
+
+        tone(
+            700 + Math.random()*900,
+            .08,
+            .004,
+            "sine"
+        );
+
+        rainSoundTimer =
+            setTimeout(
+                rainDropSound,
+                80 + Math.random()*180
+            );
+    }
+
+    rainDropSound();
+}
+
+
+/* =========================================================
+   TREE SOUND
+========================================================= */
+
+function treeSound(){
+
+    tone(320,.35,.018,"sine");
+
+    setTimeout(()=>{
+        tone(420,.4,.012,"sine");
+    },180);
+}
+
+
+/* =========================================================
+   HOUSE SOUND
+========================================================= */
+
+function houseSound(){
+
+    tone(390,.25,.018,"sine");
+
+    setTimeout(()=>{
+        tone(520,.35,.015,"sine");
+    },130);
+}
+
+
+/* =========================================================
+   BUTTERFLY SOUND
+========================================================= */
+
+function butterflySound(){
+
+    tone(740,.2,.015,"sine");
+
+    setTimeout(()=>{
+        tone(930,.25,.012,"sine");
+    },120);
+}
+
+
+/* =========================================================
+   CLOUD SOUND
+========================================================= */
+
+function cloudSound(){
+
+    tone(420,.5,.012,"sine");
+}
+
+
+/* =========================================================
+   BOAT SOUND
+========================================================= */
+
+function boatSound(){
+
+    tone(280,.3,.015,"sine");
+
+    setTimeout(()=>{
+        tone(340,.35,.012,"sine");
+    },160);
+}
+
+
+/* =========================================================
+   SUN SOUND
+========================================================= */
+
+function sunSound(){
+
+    tone(520,.3,.018,"sine");
+
+    setTimeout(()=>{
+        tone(660,.4,.014,"sine");
+    },130);
+}
+
+
+/* =========================================================
+   MOON SOUND
+========================================================= */
+
+function moonSound(){
+
+    tone(440,.5,.012,"sine");
+
+    setTimeout(()=>{
+        tone(330,.6,.009,"sine");
+    },180);
 }
 
 
@@ -1791,182 +1289,411 @@ function playTone(
    CALM BACKGROUND MUSIC
 ========================================================= */
 
-function startMusic() {
+const melody = [
+    261.63,
+    329.63,
+    392.00,
+    329.63,
+    293.66,
+    349.23,
+    440.00,
+    349.23
+];
 
-    if (musicStarted) {
-        return;
-    }
+let melodyIndex = 0;
+
+function playBackgroundNote(){
+
+    if(!audioContext) return;
+
+    const frequency =
+        melody[melodyIndex];
+
+    melodyIndex =
+        (melodyIndex + 1) % melody.length;
+
+    tone(
+        frequency,
+        2.5,
+        .006,
+        "sine"
+    );
+}
+
+function startMusic(){
+
+    if(musicStarted) return;
 
     initAudio();
 
     musicStarted = true;
 
+    musicStatus.textContent =
+        "🎵 Calm music";
 
-    /*
-       Very slow relaxing melody.
-       No sharp notes.
-    */
-
-    const melody = [
-
-        261.63,
-        329.63,
-        392.00,
-        329.63,
-
-        293.66,
-        349.23,
-        440.00,
-        349.23
-
-    ];
-
-
-    let index = 0;
-
-
-    function playMusicNote() {
-
-        if (!audioContext) {
-            return;
-        }
-
-
-        const oscillator =
-            audioContext.createOscillator();
-
-        const gain =
-            audioContext.createGain();
-
-
-        oscillator.type =
-            "sine";
-
-
-        oscillator.frequency.value =
-            melody[
-                index %
-                melody.length
-            ];
-
-
-        gain.gain.setValueAtTime(
-            .0001,
-            audioContext.currentTime
-        );
-
-
-        gain.gain.linearRampToValueAtTime(
-            .009,
-            audioContext.currentTime + .5
-        );
-
-
-        gain.gain.exponentialRampToValueAtTime(
-            .0001,
-            audioContext.currentTime + 3
-        );
-
-
-        oscillator.connect(gain);
-
-        gain.connect(
-            audioContext.destination
-        );
-
-
-        oscillator.start();
-
-
-        oscillator.stop(
-            audioContext.currentTime + 3.1
-        );
-
-
-        index++;
-    }
-
-
-    playMusicNote();
-
+    playBackgroundNote();
 
     musicTimer =
         setInterval(
-            playMusicNote,
+            playBackgroundNote,
             3200
         );
 }
 
 
 /* =========================================================
-   OBJECT SOUNDS
+   STARS
 ========================================================= */
 
-function objectSound(type) {
+function createStars(){
 
-    const sounds = {
+    stars.innerHTML = "";
 
-        flower:
-            [523.25, 659.25],
+    for(let i=0;i<45;i++){
 
-        tree:
-            [261.63, 329.63],
+        const star =
+            document.createElement("div");
 
-        house:
-            [392, 523.25],
+        star.className = "star";
 
-        butterfly:
-            [659.25, 783.99],
+        star.style.left =
+            Math.random()*100 + "%";
 
-        bird:
-            [783.99, 659.25],
+        star.style.top =
+            Math.random()*55 + "%";
 
-        cloud:
-            [493.88, 587.33],
+        stars.appendChild(star);
+    }
+}
 
-        rain:
-            [349.23, 293.66],
-
-        river:
-            [293.66, 392],
-
-        boat:
-            [392, 493.88],
-
-        sun:
-            [523.25, 659.25],
-
-        moon:
-            [440, 523.25]
-
-    };
+createStars();
 
 
-    const pair =
-        sounds[type];
+/* =========================================================
+   RAIN DROPS
+========================================================= */
+
+function createRain(){
+
+    rain.innerHTML = "";
+
+    for(let i=0;i<80;i++){
+
+        const drop =
+            document.createElement("div");
+
+        drop.className =
+            "raindrop";
+
+        drop.style.left =
+            Math.random()*100 + "%";
+
+        drop.style.animationDuration =
+            (0.7 + Math.random()*0.7) + "s";
+
+        drop.style.animationDelay =
+            (-Math.random()*2) + "s";
+
+        rain.appendChild(drop);
+    }
+}
+
+createRain();
 
 
-    if (!pair) {
+/* =========================================================
+   OBJECT HELPERS
+========================================================= */
+
+function addFlower(){
+
+    const flowers =
+        document.querySelectorAll(".flower");
+
+    const positions =
+        ["f1","f2","f3","f4","f5","f6"];
+
+    if(flowers.length >= positions.length){
+        flowerBling();
         return;
     }
 
+    const flower =
+        document.createElement("div");
 
-    playTone(
-        pair[0],
-        .25,
-        .018
-    );
+    flower.className =
+        "flower " +
+        positions[flowers.length];
+
+    const flowerTypes =
+        ["🌷","🌸","🌼","🌻","🌺"];
+
+    flower.textContent =
+        flowerTypes[
+            flowers.length %
+            flowerTypes.length
+        ];
+
+    objects.appendChild(flower);
+
+    flowerBling();
+}
 
 
-    setTimeout(() => {
+/* =========================================================
+   TREE
+========================================================= */
 
-        playTone(
-            pair[1],
-            .35,
-            .015
-        );
+function addTree(){
 
-    }, 150);
+    const trees =
+        document.querySelectorAll(".tree");
+
+    const positions =
+        ["t1","t2","t3","t4"];
+
+    if(trees.length >= positions.length){
+        treeSound();
+        return;
+    }
+
+    const tree =
+        document.createElement("div");
+
+    tree.className =
+        "tree " +
+        positions[trees.length];
+
+    tree.textContent = "🌳";
+
+    objects.appendChild(tree);
+
+    treeSound();
+}
+
+
+/* =========================================================
+   HOUSE
+========================================================= */
+
+function addHouse(){
+
+    if(document.querySelector(".house")){
+        houseSound();
+        return;
+    }
+
+    const house =
+        document.createElement("div");
+
+    house.className = "house";
+
+    const w1 =
+        document.createElement("div");
+
+    w1.className =
+        "house-window hw1";
+
+    const w2 =
+        document.createElement("div");
+
+    w2.className =
+        "house-window hw2";
+
+    house.appendChild(w1);
+    house.appendChild(w2);
+
+    objects.appendChild(house);
+
+    houseSound();
+}
+
+
+/* =========================================================
+   BUTTERFLY
+========================================================= */
+
+function addButterfly(){
+
+    const butterflies =
+        document.querySelectorAll(".butterfly");
+
+    const positions =
+        ["b1","b2"];
+
+    if(butterflies.length >= positions.length){
+        butterflySound();
+        return;
+    }
+
+    const butterfly =
+        document.createElement("div");
+
+    butterfly.className =
+        "butterfly " +
+        positions[butterflies.length];
+
+    butterfly.textContent = "🦋";
+
+    objects.appendChild(butterfly);
+
+    butterflySound();
+}
+
+
+/* =========================================================
+   BIRD
+========================================================= */
+
+function addBird(){
+
+    const birds =
+        document.querySelectorAll(".bird");
+
+    const positions =
+        ["bird1","bird2"];
+
+    if(birds.length >= positions.length){
+        birdChirp();
+        return;
+    }
+
+    const bird =
+        document.createElement("div");
+
+    bird.className =
+        "bird " +
+        positions[birds.length];
+
+    bird.textContent = "🐦";
+
+    objects.appendChild(bird);
+
+    birdChirp();
+}
+
+
+/* =========================================================
+   CLOUD
+========================================================= */
+
+function addCloud(){
+
+    const clouds =
+        document.querySelectorAll(".command-cloud");
+
+    const positions =
+        ["cc1","cc2"];
+
+    if(clouds.length >= positions.length){
+        cloudSound();
+        return;
+    }
+
+    const cloud =
+        document.createElement("div");
+
+    cloud.className =
+        "command-cloud " +
+        positions[clouds.length];
+
+    cloud.textContent = "☁️";
+
+    objects.appendChild(cloud);
+
+    cloudSound();
+}
+
+
+/* =========================================================
+   RIVER
+========================================================= */
+
+function activateRiver(){
+
+    river.classList.add("visible");
+
+    startRiverSound();
+}
+
+
+/* =========================================================
+   RAIN
+========================================================= */
+
+function activateRain(){
+
+    rain.classList.add("visible");
+
+    startRainSound();
+}
+
+
+/* =========================================================
+   BOAT
+========================================================= */
+
+function addBoat(){
+
+    if(!river.classList.contains("visible")){
+        activateRiver();
+    }
+
+    if(document.querySelector(".boat")){
+        boatSound();
+        return;
+    }
+
+    const boat =
+        document.createElement("div");
+
+    boat.className = "boat";
+
+    boat.textContent = "⛵";
+
+    objects.appendChild(boat);
+
+    boatSound();
+}
+
+
+/* =========================================================
+   DAY
+========================================================= */
+
+function setDay(){
+
+    sun.classList.remove("hidden");
+
+    moon.classList.remove("visible");
+
+    stars.style.opacity = "0";
+
+    document.getElementById("world")
+        .style.background =
+        "linear-gradient(to bottom,#8ed8ff 0%,#bcecff 52%,#dff6c9 53%,#9bd47c 100%)";
+
+    sunSound();
+}
+
+
+/* =========================================================
+   NIGHT
+========================================================= */
+
+function setNight(){
+
+    sun.classList.add("hidden");
+
+    moon.classList.add("visible");
+
+    stars.style.opacity = "1";
+
+    document.getElementById("world")
+        .style.background =
+        "linear-gradient(to bottom,#182b4a 0%,#314d70 52%,#42634a 53%,#34553a 100%)";
+
+    moonSound();
 }
 
 
@@ -1978,192 +1705,110 @@ const SpeechRecognition =
     window.SpeechRecognition ||
     window.webkitSpeechRecognition;
 
-
 let recognition = null;
 
 let recognitionRunning = false;
 
 let manuallyStopped = true;
 
-let restartTimer = null;
-
-
-/*
-   IMPORTANT:
-
-   When the garden speaks:
-
-       recognition stops
-
-   When the garden finishes speaking:
-
-       small quiet gap
-
-   Then:
-
-       recognition starts
-
-   This prevents the device from
-   hearing its own voice.
-*/
-
-
-/* =========================================================
-   INITIALIZE RECOGNITION
-========================================================= */
-
-if (SpeechRecognition) {
+if(SpeechRecognition){
 
     recognition =
         new SpeechRecognition();
 
+    recognition.lang = "en-IN";
 
-    recognition.lang =
-        "en-IN";
+    recognition.continuous = true;
 
+    /*
+       IMPORTANT:
+       Final results only.
+       This prevents the recognizer from reacting
+       to partial fragments and becoming unstable.
+    */
+    recognition.interimResults = false;
 
-    recognition.continuous =
-        true;
-
-
-    recognition.interimResults =
-        false;
-
-
-    recognition.maxAlternatives =
-        1;
+    recognition.maxAlternatives = 1;
 
 
-    recognition.onstart =
-        function() {
+    recognition.onstart = function(){
 
-            recognitionRunning =
-                true;
+        recognitionRunning = true;
 
-            voiceButton.classList.add(
-                "listening"
-            );
+        voiceButton.classList.add("listening");
 
-            voiceButton.textContent =
-                "🎙️";
-        };
+        voiceButton.textContent =
+            "🎙️ Listening...";
+    };
 
 
-    recognition.onresult =
-        function(event) {
+    recognition.onresult = function(event){
 
-            for (
-                let i =
-                    event.resultIndex;
+        for(
+            let i = event.resultIndex;
+            i < event.results.length;
+            i++
+        ){
 
-                i <
-                    event.results.length;
-
-                i++
-            ) {
-
-                const result =
-                    event.results[i];
-
-
-                if (
-                    !result.isFinal
-                ) {
-                    continue;
-                }
-
+            if(
+                event.results[i].isFinal
+            ){
 
                 const text =
-                    result[0]
+                    event.results[i][0]
                     .transcript
                     .toLowerCase()
                     .trim();
 
-
-                console.log(
-                    "User said:",
-                    text
-                );
-
-
                 processCommand(text);
             }
-        };
+        }
+    };
 
 
-    recognition.onerror =
-        function(event) {
+    recognition.onerror = function(event){
 
-            console.log(
-                "Recognition error:",
-                event.error
-            );
+        recognitionRunning = false;
 
+        voiceButton.classList.remove("listening");
 
-            recognitionRunning =
-                false;
+        voiceButton.textContent =
+            "🎙️ Speak";
 
+        if(
+            event.error === "not-allowed" ||
+            event.error === "service-not-allowed"
+        ){
 
-            voiceButton.classList.remove(
-                "listening"
-            );
+            guideText.textContent =
+                "Please allow microphone access.";
 
-
-            voiceButton.textContent =
-                "🎤";
-
-
-            if (
-                event.error ===
-                    "not-allowed" ||
-
-                event.error ===
-                    "service-not-allowed"
-            ) {
-
-                manuallyStopped =
-                    true;
-
-                showAssistant(
-                    "Please allow microphone access so I can listen to you."
-                );
-
-                return;
-            }
+            manuallyStopped = true;
+        }
+    };
 
 
-            if (
-                !manuallyStopped
-            ) {
+    recognition.onend = function(){
 
-                scheduleRecognition();
-            }
-        };
+        recognitionRunning = false;
 
+        voiceButton.classList.remove("listening");
 
-    recognition.onend =
-        function() {
+        voiceButton.textContent =
+            "🎙️ Speak";
 
-            recognitionRunning =
-                false;
+        /*
+           If recognition stopped unexpectedly,
+           restart only when we are supposed to be listening.
+        */
 
+        if(!manuallyStopped){
 
-            voiceButton.classList.remove(
-                "listening"
-            );
-
-
-            voiceButton.textContent =
-                "🎤";
-
-
-            if (
-                !manuallyStopped
-            ) {
-
-                scheduleRecognition();
-            }
-        };
+            setTimeout(()=>{
+                startRecognition();
+            },300);
+        }
+    };
 }
 
 
@@ -2171,74 +1816,26 @@ if (SpeechRecognition) {
    START RECOGNITION
 ========================================================= */
 
-function startRecognition() {
+function startRecognition(){
 
-    if (!recognition) {
+    if(!recognition) return;
 
-        showAssistant(
-            "Voice recognition is not supported here. Please use Chrome or Edge."
-        );
+    if(recognitionRunning) return;
 
-        return;
-    }
+    if(manuallyStopped) return;
 
-
-    if (recognitionRunning) {
-        return;
-    }
-
-
-    manuallyStopped =
-        false;
-
-
-    try {
+    try{
 
         recognition.start();
 
-    } catch (error) {
+    }catch(error){
 
-        console.log(
-            "Start error:",
-            error
-        );
+        /*
+           Browser may throw if start() is called
+           while it is already starting.
+        */
+
     }
-}
-
-
-/* =========================================================
-   SCHEDULE RECOGNITION
-========================================================= */
-
-function scheduleRecognition(
-    delay = 500
-) {
-
-    clearTimeout(
-        restartTimer
-    );
-
-
-    if (manuallyStopped) {
-        return;
-    }
-
-
-    restartTimer =
-        setTimeout(
-            () => {
-
-                if (
-                    !recognitionRunning &&
-                    !manuallyStopped
-                ) {
-
-                    startRecognition();
-                }
-
-            },
-            delay
-        );
 }
 
 
@@ -2246,1225 +1843,218 @@ function scheduleRecognition(
    STOP RECOGNITION
 ========================================================= */
 
-function stopRecognition() {
+function stopRecognition(){
 
-    clearTimeout(
-        restartTimer
-    );
+    manuallyStopped = true;
 
+    if(
+        recognition &&
+        recognitionRunning
+    ){
 
-    if (!recognition) {
-        return;
+        try{
+            recognition.stop();
+        }catch(e){}
     }
 
+    recognitionRunning = false;
 
-    try {
-
-        recognition.stop();
-
-    } catch (error) {}
-
-
-    recognitionRunning =
-        false;
-
-
-    voiceButton.classList.remove(
-        "listening"
-    );
-
+    voiceButton.classList.remove("listening");
 
     voiceButton.textContent =
-        "🎤";
+        "🎙️ Speak";
 }
 
 
 /* =========================================================
-   GARDEN SPEECH
+   SPEAK ONLY AT BEGINNING
 ========================================================= */
 
-let speechQueueId = 0;
-
-
-function showAssistant(text) {
-
-    assistantMessage.textContent =
-        text;
-}
-
-
-/*
-   This is the most important function.
-
-   1. Stop microphone.
-   2. Wait until it has stopped.
-   3. Speak.
-   4. Wait until speech is completely finished.
-   5. Wait another quiet period.
-   6. Restart microphone.
-*/
-
-function gardenSpeak(
-    text,
-    restartMic = true
-) {
-
-    speechQueueId++;
-
-    const currentSpeechId =
-        speechQueueId;
-
-
-    showAssistant(text);
-
+function speakInstructions(text, finishedCallback){
 
     /*
-       FIRST:
-       completely stop microphone.
+       VERY IMPORTANT:
+       Stop microphone BEFORE speaking.
+
+       Therefore the microphone cannot hear
+       the guide's own voice.
     */
 
     stopRecognition();
 
+    if(!("speechSynthesis" in window)){
 
-    if (
-        !("speechSynthesis" in window)
-    ) {
-
-        if (restartMic) {
-
-            scheduleRecognition(700);
+        if(finishedCallback){
+            finishedCallback();
         }
 
         return;
     }
 
-
-    window.speechSynthesis.cancel();
-
+    speechSynthesis.cancel();
 
     const utterance =
-        new SpeechSynthesisUtterance(
-            text
-        );
+        new SpeechSynthesisUtterance(text);
 
+    utterance.lang = "en-IN";
 
-    utterance.lang =
-        "en-IN";
+    utterance.rate = 0.88;
 
+    utterance.pitch = 1.0;
 
-    utterance.rate =
-        .78;
+    utterance.volume = 0.9;
 
 
-    utterance.pitch =
-        1.04;
-
-
-    utterance.volume =
-        .68;
-
-
-    /*
-       Speech begins only after
-       recognition has stopped.
-    */
-
-    setTimeout(
-        () => {
-
-            /*
-               Prevent old speech callbacks
-               from restarting recognition.
-            */
-
-            if (
-                currentSpeechId !==
-                speechQueueId
-            ) {
-                return;
-            }
-
-
-            window.speechSynthesis.speak(
-                utterance
-            );
-
-        },
-        180
-    );
-
-
-    /*
-       Speech completely finished.
-    */
-
-    utterance.onend =
-        function() {
-
-            if (
-                currentSpeechId !==
-                speechQueueId
-            ) {
-                return;
-            }
-
-
-            if (restartMic) {
-
-                /*
-                   QUIET GAP.
-
-                   This is important because
-                   some phones keep the audio
-                   stream alive for a moment.
-                */
-
-                scheduleRecognition(
-                    800
-                );
-            }
-        };
-
-
-    utterance.onerror =
-        function() {
-
-            if (
-                currentSpeechId !==
-                speechQueueId
-            ) {
-                return;
-            }
-
-
-            if (restartMic) {
-
-                scheduleRecognition(
-                    800
-                );
-            }
-        };
-}
-
-
-/* =========================================================
-   STARS
-========================================================= */
-
-function createStars() {
-
-    stars.innerHTML = "";
-
-
-    for (
-        let i = 0;
-        i < 55;
-        i++
-    ) {
-
-        const star =
-            document.createElement(
-                "div"
-            );
-
-
-        star.className =
-            "star";
-
-
-        star.style.left =
-            Math.random() *
-            100 +
-            "%";
-
-
-        star.style.top =
-            Math.random() *
-            55 +
-            "%";
-
-
-        star.style.animationDelay =
-            Math.random() *
-            3 +
-            "s";
-
-
-        stars.appendChild(
-            star
-        );
-    }
-}
-
-
-createStars();
-
-
-/* =========================================================
-   RAIN DROPS
-========================================================= */
-
-function createRain() {
-
-    rain.innerHTML = "";
-
-
-    for (
-        let i = 0;
-        i < 75;
-        i++
-    ) {
-
-        const drop =
-            document.createElement(
-                "div"
-            );
-
-
-        drop.className =
-            "raindrop";
-
-
-        drop.style.left =
-            Math.random() *
-            100 +
-            "%";
-
-
-        drop.style.animationDelay =
-            Math.random() *
-            1.5 +
-            "s";
-
-
-        drop.style.animationDuration =
-            (
-                .8 +
-                Math.random() * .6
-            ) +
-            "s";
-
-
-        rain.appendChild(
-            drop
-        );
-    }
-}
-
-
-createRain();
-
-
-/* =========================================================
-   COUNTERS
-========================================================= */
-
-const counts = {
-
-    flower: 0,
-    tree: 0,
-    house: 0,
-    butterfly: 0,
-    bird: 0,
-    cloud: 0,
-    boat: 0
-
-};
-
-
-const limits = {
-
-    flower: 6,
-    tree: 4,
-    butterfly: 4,
-    bird: 3,
-    cloud: 3
-
-};
-
-
-/* =========================================================
-   EMOJIS
-========================================================= */
-
-const flowerEmojis = [
-
-    "🌸",
-    "🌼",
-    "🌷",
-    "🌺",
-    "🌻"
-
-];
-
-
-const treeEmojis = [
-
-    "🌳",
-    "🌲"
-
-];
-
-
-const birdEmojis = [
-
-    "🐦",
-    "🕊️"
-
-];
-
-
-/* =========================================================
-   ADD FLOWER
-========================================================= */
-
-function addFlower() {
-
-    if (
-        counts.flower >=
-        limits.flower
-    ) {
-
-        gardenSpeak(
-            "Your garden already has many beautiful flowers."
-        );
-
-        return;
-    }
-
-
-    counts.flower++;
-
-
-    const flower =
-        document.createElement(
-            "div"
-        );
-
-
-    flower.className =
-        "garden-object flower f" +
-        counts.flower;
-
-
-    flower.textContent =
-        flowerEmojis[
-            (counts.flower - 1) %
-            flowerEmojis.length
-        ];
-
-
-    objects.appendChild(
-        flower
-    );
-
-
-    objectSound("flower");
-}
-
-
-/* =========================================================
-   ADD TREE
-========================================================= */
-
-function addTree() {
-
-    if (
-        counts.tree >=
-        limits.tree
-    ) {
-
-        gardenSpeak(
-            "Your garden already has lovely trees."
-        );
-
-        return;
-    }
-
-
-    counts.tree++;
-
-
-    const tree =
-        document.createElement(
-            "div"
-        );
-
-
-    tree.className =
-        "garden-object tree t" +
-        counts.tree;
-
-
-    tree.textContent =
-        treeEmojis[
-            (counts.tree - 1) %
-            treeEmojis.length
-        ];
-
-
-    objects.appendChild(
-        tree
-    );
-
-
-    objectSound("tree");
-}
-
-
-/* =========================================================
-   ADD HOUSE
-========================================================= */
-
-function addHouse() {
-
-    if (
-        counts.house >= 1
-    ) {
-
-        gardenSpeak(
-            "Your little house is already in the garden."
-        );
-
-        return;
-    }
-
-
-    counts.house = 1;
-
-
-    const house =
-        document.createElement(
-            "div"
-        );
-
-
-    house.className =
-        "garden-object house";
-
-
-    house.textContent =
-        "🏡";
-
-
-    objects.appendChild(
-        house
-    );
-
-
-    objectSound("house");
-}
-
-
-/* =========================================================
-   ADD BUTTERFLY
-========================================================= */
-
-function addButterfly() {
-
-    if (
-        counts.butterfly >=
-        limits.butterfly
-    ) {
-
-        gardenSpeak(
-            "Your garden already has several butterflies."
-        );
-
-        return;
-    }
-
-
-    counts.butterfly++;
-
-
-    const butterfly =
-        document.createElement(
-            "div"
-        );
-
-
-    butterfly.className =
-        "garden-object butterfly b" +
-        counts.butterfly;
-
-
-    butterfly.textContent =
-        "🦋";
-
-
-    objects.appendChild(
-        butterfly
-    );
-
-
-    objectSound("butterfly");
-}
-
-
-/* =========================================================
-   ADD BIRD
-========================================================= */
-
-function addBird() {
-
-    if (
-        counts.bird >=
-        limits.bird
-    ) {
-
-        gardenSpeak(
-            "There are already some little birds in the sky."
-        );
-
-        return;
-    }
-
-
-    counts.bird++;
-
-
-    const bird =
-        document.createElement(
-            "div"
-        );
-
-
-    bird.className =
-        "garden-object bird b" +
-        counts.bird;
-
-
-    bird.textContent =
-        birdEmojis[
-            (counts.bird - 1) %
-            birdEmojis.length
-        ];
-
-
-    objects.appendChild(
-        bird
-    );
-
-
-    objectSound("bird");
-}
-
-
-/* =========================================================
-   ADD CLOUD
-========================================================= */
-
-function addCloud() {
-
-    if (
-        counts.cloud >=
-        limits.cloud
-    ) {
-
-        gardenSpeak(
-            "There are already soft clouds in the sky."
-        );
-
-        return;
-    }
-
-
-    counts.cloud++;
-
-
-    const cloud =
-        document.createElement(
-            "div"
-        );
-
-
-    cloud.className =
-        "garden-object cloud-object c" +
-        counts.cloud;
-
-
-    cloud.textContent =
-        "☁️";
-
-
-    objects.appendChild(
-        cloud
-    );
-
-
-    objectSound("cloud");
-}
-
-
-/* =========================================================
-   ADD BOAT
-========================================================= */
-
-function addBoat() {
-
-    if (
-        counts.boat >= 1
-    ) {
-
-        gardenSpeak(
-            "Your little boat is already sailing on the river."
-        );
-
-        return;
-    }
-
-
-    counts.boat = 1;
-
-
-    const boat =
-        document.createElement(
-            "div"
-        );
-
-
-    boat.className =
-        "garden-object boat";
-
-
-    boat.textContent =
-        "🚤";
-
-
-    objects.appendChild(
-        boat
-    );
-
-
-    objectSound("boat");
-}
-
-
-/* =========================================================
-   RIVER
-========================================================= */
-
-function activateRiver() {
-
-    objectSound("river");
-
-
-    gardenSpeak(
-        "A peaceful river is flowing through your garden."
-    );
-}
-
-
-/* =========================================================
-   RAIN
-========================================================= */
-
-function activateRain() {
-
-    rain.classList.add(
-        "active"
-    );
-
-
-    objectSound("rain");
-
-
-    gardenSpeak(
-        "Gentle rain is falling over your garden."
-    );
-}
-
-
-/* =========================================================
-   DAY
-========================================================= */
-
-function setDay() {
-
-    world.classList.remove(
-        "night"
-    );
-
-
-    objectSound("sun");
-
-
-    gardenSpeak(
-        "The sun is shining. It is a beautiful day in your garden."
-    );
-}
-
-
-/* =========================================================
-   NIGHT
-========================================================= */
-
-function setNight() {
-
-    world.classList.add(
-        "night"
-    );
-
-
-    objectSound("moon");
-
-
-    gardenSpeak(
-        "The moon is shining gently over your peaceful garden."
-    );
-}
-
-
-/* =========================================================
-   COMMAND HIGHLIGHT
-========================================================= */
-
-function highlightCommand(
-    command
-) {
-
-    document
-        .querySelectorAll(
-            ".command-pill"
-        )
-        .forEach(
-            pill => {
-
-                pill.classList.remove(
-                    "active"
-                );
-
-
-                if (
-                    pill.dataset.command ===
-                    command
-                ) {
-
-                    pill.classList.add(
-                        "active"
-                    );
-
-
-                    setTimeout(
-                        () => {
-
-                            pill.classList.remove(
-                                "active"
-                            );
-
-                        },
-                        3500
-                    );
-                }
-
-            }
-        );
-}
-
-
-/* =========================================================
-   PROCESS VOICE COMMAND
-========================================================= */
-
-function processCommand(
-    text
-) {
-
-    text =
-        text
-        .toLowerCase()
-        .trim();
-
-
-    console.log(
-        "COMMAND:",
-        text
-    );
-
-
-    /*
-       FLOWER
-    */
-
-    if (
-        text.includes("flower") ||
-        text.includes("flowers")
-    ) {
-
-        highlightCommand(
-            "flower"
-        );
-
-        addFlower();
-
-        teachNext();
-
-        return;
-    }
-
-
-    /*
-       TREE
-    */
-
-    if (
-        text.includes("tree") ||
-        text.includes("trees")
-    ) {
-
-        highlightCommand(
-            "tree"
-        );
-
-        addTree();
-
-        teachNext();
-
-        return;
-    }
-
-
-    /*
-       HOUSE
-    */
-
-    if (
-        text.includes("house") ||
-        text.includes("home")
-    ) {
-
-        highlightCommand(
-            "house"
-        );
-
-        addHouse();
-
-        teachNext();
-
-        return;
-    }
-
-
-    /*
-       BUTTERFLY
-    */
-
-    if (
-        text.includes("butterfly") ||
-        text.includes("butterflies")
-    ) {
-
-        highlightCommand(
-            "butterfly"
-        );
-
-        addButterfly();
-
-        teachNext();
-
-        return;
-    }
-
-
-    /*
-       BIRD
-    */
-
-    if (
-        text.includes("bird") ||
-        text.includes("birds")
-    ) {
-
-        highlightCommand(
-            "bird"
-        );
-
-        addBird();
-
-        teachNext();
-
-        return;
-    }
-
-
-    /*
-       CLOUD
-    */
-
-    if (
-        text.includes("cloud") ||
-        text.includes("clouds")
-    ) {
-
-        highlightCommand(
-            "cloud"
-        );
-
-        addCloud();
-
-        teachNext();
-
-        return;
-    }
-
-
-    /*
-       RAIN
-    */
-
-    if (
-        text.includes("rain") ||
-        text.includes("raining")
-    ) {
-
-        highlightCommand(
-            "rain"
-        );
-
-        activateRain();
-
-        teachNext();
-
-        return;
-    }
-
-
-    /*
-       RIVER
-    */
-
-    if (
-        text.includes("river") ||
-        text.includes("water")
-    ) {
-
-        highlightCommand(
-            "river"
-        );
+    utterance.onend = function(){
 
         /*
-           River already exists visually.
-           We simply acknowledge it.
+           Recognition starts ONLY after the
+           complete sentence has finished.
         */
 
-        objectSound("river");
+        if(finishedCallback){
+
+            setTimeout(
+                finishedCallback,
+                500
+            );
+        }
+    };
 
 
-        gardenSpeak(
-            "The peaceful river is flowing through your garden."
-        );
+    utterance.onerror = function(){
+
+        if(finishedCallback){
+
+            setTimeout(
+                finishedCallback,
+                500
+            );
+        }
+    };
 
 
-        teachNext();
-
-        return;
-    }
-
-
-    /*
-       BOAT
-    */
-
-    if (
-        text.includes("boat") ||
-        text.includes("ship")
-    ) {
-
-        highlightCommand(
-            "boat"
-        );
-
-        addBoat();
-
-        teachNext();
-
-        return;
-    }
-
-
-    /*
-       SUN
-    */
-
-    if (
-        text.includes("sun") ||
-        text.includes("day")
-    ) {
-
-        highlightCommand(
-            "sun"
-        );
-
-        setDay();
-
-        teachNext();
-
-        return;
-    }
-
-
-    /*
-       MOON
-    */
-
-    if (
-        text.includes("moon") ||
-        text.includes("night")
-    ) {
-
-        highlightCommand(
-            "moon"
-        );
-
-        setNight();
-
-        teachNext();
-
-        return;
-    }
-
-
-    /*
-       UNKNOWN
-    */
-
-    gardenSpeak(
-        "I am listening. You can say flower, tree, house, butterfly, bird, cloud, rain, river, boat, sun, or moon."
-    );
+    speechSynthesis.speak(utterance);
 }
 
 
 /* =========================================================
-   TEACHING
+   PROCESS COMMAND
 ========================================================= */
 
-const teachingSteps = [
+function processCommand(text){
 
-    {
-        command: "flower",
+    console.log("Heard:",text);
 
-        text:
-        "You can say flower. When you say flower, I will grow a beautiful flower."
-    },
+    if(
+        text.includes("flower") ||
+        text.includes("flowers") ||
+        text.includes("bloom")
+    ){
 
-    {
-        command: "tree",
-
-        text:
-        "Now try tree. Say tree and a beautiful tree will grow."
-    },
-
-    {
-        command: "house",
-
-        text:
-        "You can say house. A little house will appear in your garden."
-    },
-
-    {
-        command: "butterfly",
-
-        text:
-        "Try butterfly. A beautiful butterfly will fly among your flowers."
-    },
-
-    {
-        command: "bird",
-
-        text:
-        "You can say bird. A little bird will visit the sky."
-    },
-
-    {
-        command: "cloud",
-
-        text:
-        "Say cloud and a soft cloud will float above your garden."
-    },
-
-    {
-        command: "rain",
-
-        text:
-        "Say rain when you would like gentle rain in your garden."
-    },
-
-    {
-        command: "river",
-
-        text:
-        "Say river and I will show you the peaceful river."
-    },
-
-    {
-        command: "boat",
-
-        text:
-        "Say boat and a little boat will sail on the river."
-    },
-
-    {
-        command: "sun",
-
-        text:
-        "Say sun to enjoy a bright sunny day."
-    },
-
-    {
-        command: "moon",
-
-        text:
-        "Say moon to enjoy a peaceful night."
-    }
-
-];
-
-
-let teachingIndex = 0;
-
-
-/* =========================================================
-   TEACH NEXT
-========================================================= */
-
-function teachNext() {
-
-    if (
-        teachingIndex >=
-        teachingSteps.length
-    ) {
-
-        gardenSpeak(
-            "Wonderful. You have learned all the garden words. Now you can talk to your garden freely."
-        );
-
+        addFlower();
         return;
     }
 
 
-    const step =
-        teachingSteps[
-            teachingIndex
-        ];
+    if(
+        text.includes("tree") ||
+        text.includes("trees")
+    ){
+
+        addTree();
+        return;
+    }
 
 
-    highlightCommand(
-        step.command
-    );
+    if(
+        text.includes("house") ||
+        text.includes("home")
+    ){
+
+        addHouse();
+        return;
+    }
 
 
-    /*
-       Increase index BEFORE speaking.
-       This prevents repeated teaching.
-    */
+    if(
+        text.includes("butterfly") ||
+        text.includes("butterflies")
+    ){
 
-    teachingIndex++;
+        addButterfly();
+        return;
+    }
 
 
-    gardenSpeak(
-        step.text
-    );
+    if(
+        text.includes("bird") ||
+        text.includes("birds")
+    ){
+
+        addBird();
+        return;
+    }
+
+
+    if(
+        text.includes("cloud") ||
+        text.includes("clouds")
+    ){
+
+        addCloud();
+        return;
+    }
+
+
+    if(
+        text.includes("rain") ||
+        text.includes("raining")
+    ){
+
+        activateRain();
+        return;
+    }
+
+
+    if(
+        text.includes("river") ||
+        text.includes("water")
+    ){
+
+        activateRiver();
+        return;
+    }
+
+
+    if(
+        text.includes("boat")
+    ){
+
+        addBoat();
+        return;
+    }
+
+
+    if(
+        text.includes("sun") ||
+        text.includes("day")
+    ){
+
+        setDay();
+        return;
+    }
+
+
+    if(
+        text.includes("moon") ||
+        text.includes("night")
+    ){
+
+        setNight();
+        return;
+    }
+
 }
 
 
@@ -3474,100 +2064,107 @@ function teachNext() {
 
 voiceButton.addEventListener(
     "click",
-    function() {
+    function(){
 
         initAudio();
 
+        if(!recognition){
 
-        if (
-            recognitionRunning
-        ) {
-
-            manuallyStopped =
-                true;
-
-            stopRecognition();
-
-
-            gardenSpeak(
-                "I will pause listening. Press the microphone whenever you want me to listen again.",
-                false
-            );
-
+            guideText.textContent =
+                "Voice recognition is not supported in this browser. Try Chrome on Android.";
 
             return;
         }
 
+        if(recognitionRunning){
 
-        manuallyStopped =
-            false;
+            stopRecognition();
 
+        }else{
 
-        startRecognition();
+            manuallyStopped = false;
 
-
-        showAssistant(
-            "I am listening. Tell me what you would like in your garden."
-        );
+            startRecognition();
+        }
     }
 );
 
 
 /* =========================================================
-   START BUTTON
+   START GARDEN
 ========================================================= */
 
 startButton.addEventListener(
     "click",
-    function() {
+    function(){
 
         initAudio();
 
         startMusic();
 
+        startScreen.style.display =
+            "none";
 
-        startPanel.classList.add(
-            "hidden"
-        );
-
-
-        /*
-           DO NOT START MICROPHONE HERE.
-
-           First the garden speaks.
-
-           When the sentence ends,
-           gardenSpeak() starts recognition.
-        */
-
-        manuallyStopped =
-            false;
-
-
-        gardenSpeak(
-            "Welcome to your peaceful garden. You can talk to me and I will help you create it.",
-            false
-        );
-
+        guideText.textContent =
+            "Listen to the garden guide...";
 
         /*
-           Teach first command only after
-           welcome sentence has completely finished.
+           ALL INSTRUCTIONS ARE SPOKEN ONCE.
+           NO RECOGNITION DURING THIS SPEECH.
         */
 
-        setTimeout(
-            () => {
+        speakInstructions(
 
-                if (
-                    !manuallyStopped
-                ) {
+            "Welcome to your Whispering Garden. " +
 
-                    teachNext();
-                }
+            "You can gently speak the name of an element " +
+            "to add it to your garden. " +
 
-            },
-            4800
+            "Say flower to grow flowers. " +
+
+            "Say tree to grow a tree. " +
+
+            "Say house to add a little house. " +
+
+            "Say butterfly to welcome butterflies. " +
+
+            "Say bird to hear birds singing. " +
+
+            "Say cloud to add clouds. " +
+
+            "Say rain to bring gentle rain. " +
+
+            "Say river to reveal the flowing river. " +
+
+            "Say boat to place a boat on the river. " +
+
+            "Say sun for daytime. " +
+
+            "Say moon for nighttime. " +
+
+            "There is no score and no wrong answer. " +
+
+            "Take your time and enjoy the garden.",
+
+            function(){
+
+                /*
+                   SPEECH IS NOW COMPLETELY FINISHED.
+
+                   ONLY NOW:
+                   microphone starts.
+                */
+
+                manuallyStopped = false;
+
+                guideText.textContent =
+                    "Your garden is ready. Speak whenever you like.";
+
+                startRecognition();
+            }
+
         );
+
     }
 );
 
@@ -3578,89 +2175,78 @@ startButton.addEventListener(
 
 resetButton.addEventListener(
     "click",
-    function() {
-
-        /*
-           Stop recognition while
-           reset message is spoken.
-        */
+    function(){
 
         stopRecognition();
 
+        speechSynthesis.cancel();
 
-        manuallyStopped =
-            false;
+        objects.innerHTML = "";
 
+        river.classList.remove("visible");
 
-        objects.innerHTML =
-            "";
+        rain.classList.remove("visible");
 
+        sun.classList.remove("hidden");
 
-        rain.classList.remove(
-            "active"
-        );
+        moon.classList.remove("visible");
 
+        stars.style.opacity = "0";
 
-        world.classList.remove(
-            "night"
-        );
+        document.getElementById("world")
+            .style.background =
+            "linear-gradient(to bottom,#8ed8ff 0%,#bcecff 52%,#dff6c9 53%,#9bd47c 100%)";
 
+        guideText.textContent =
+            "The garden is peaceful again.";
 
-        counts.flower = 0;
-        counts.tree = 0;
-        counts.house = 0;
-        counts.butterfly = 0;
-        counts.bird = 0;
-        counts.cloud = 0;
-        counts.boat = 0;
+        if(audioContext){
 
+            tone(523,.2,.025,"sine");
 
-        teachingIndex = 0;
+            setTimeout(()=>{
+                tone(659,.25,.02,"sine");
+            },120);
 
+            setTimeout(()=>{
+                tone(784,.35,.018,"sine");
+            },250);
+        }
 
-        gardenSpeak(
-            "Your garden is fresh again. Let us create it together."
-        );
+        /*
+           IMPORTANT:
+           Do NOT automatically speak another long
+           tutorial after reset.
+           
+           User can simply press Speak.
+        */
 
-
-        setTimeout(
-            () => {
-
-                if (
-                    !manuallyStopped
-                ) {
-
-                    teachNext();
-                }
-
-            },
-            3500
-        );
     }
 );
 
 
 /* =========================================================
-   INITIAL MESSAGE
-========================================================= */
-
-assistantMessage.textContent =
-    "Your peaceful garden is ready. Enter the garden to begin.";
-
-
-/* =========================================================
-   PREVENT SCREEN SLEEP / SCROLLING BEHAVIOR
+   PAGE VISIBILITY
 ========================================================= */
 
 document.addEventListener(
-    "touchmove",
-    function(event) {
+    "visibilitychange",
+    function(){
 
-        event.preventDefault();
+        if(document.hidden){
 
-    },
-    {
-        passive: false
+            if(
+                recognition &&
+                recognitionRunning
+            ){
+
+                try{
+                    recognition.stop();
+                }catch(e){}
+            }
+
+        }
+
     }
 );
 
