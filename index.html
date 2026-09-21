@@ -1,0 +1,2634 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<meta name="theme-color" content="#8fd8c8">
+
+<title>Whispering Garden</title>
+
+<style>
+
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+    overflow-x: hidden;
+    font-family:
+        "Segoe UI",
+        Arial,
+        sans-serif;
+}
+
+body {
+    background: #b9e8df;
+}
+
+/* =========================================================
+   WORLD
+========================================================= */
+
+.world {
+
+    position: relative;
+
+    width: 100%;
+
+    min-height: 100vh;
+
+    overflow: hidden;
+
+    background:
+        linear-gradient(
+            to bottom,
+            #9edff2 0%,
+            #c9f0ed 55%,
+            #9bd887 55%,
+            #65b865 100%
+        );
+
+    transition:
+        background 2.5s ease;
+
+}
+
+/* NIGHT */
+
+.world.night {
+
+    background:
+        linear-gradient(
+            to bottom,
+            #182746 0%,
+            #293d67 52%,
+            #42694d 52%,
+            #355d43 100%
+        );
+
+}
+
+/* =========================================================
+   SKY
+========================================================= */
+
+.sky {
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 62%;
+
+    overflow: hidden;
+
+}
+
+/* =========================================================
+   SUN
+========================================================= */
+
+.sun {
+
+    position: absolute;
+
+    width: 95px;
+    height: 95px;
+
+    right: 10%;
+    top: 8%;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            #fff7b0 0%,
+            #ffe36b 55%,
+            #ffc94d 100%
+        );
+
+    box-shadow:
+        0 0 25px rgba(255,225,105,.7),
+        0 0 70px rgba(255,225,105,.35);
+
+    transition:
+        opacity 1.5s ease,
+        transform 1.5s ease;
+
+}
+
+/* =========================================================
+   MOON
+========================================================= */
+
+.moon {
+
+    position: absolute;
+
+    width: 78px;
+    height: 78px;
+
+    right: 12%;
+    top: 9%;
+
+    border-radius: 50%;
+
+    background: #fff7cf;
+
+    box-shadow:
+        0 0 30px rgba(255,247,207,.35);
+
+    opacity: 0;
+
+    transform: scale(.7);
+
+    transition:
+        opacity 1.5s ease,
+        transform 1.5s ease;
+
+}
+
+.moon::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 78px;
+    height: 78px;
+
+    left: 22px;
+    top: -8px;
+
+    border-radius: 50%;
+
+    background: #24345b;
+
+}
+
+/* =========================================================
+   STARS
+========================================================= */
+
+.stars {
+
+    position: absolute;
+
+    inset: 0;
+
+    opacity: 0;
+
+    transition: opacity 2s ease;
+
+}
+
+.world.night .stars {
+
+    opacity: 1;
+
+}
+
+.star {
+
+    position: absolute;
+
+    color: #fff8cf;
+
+    font-size: 10px;
+
+    animation: twinkle 3s ease-in-out infinite;
+
+}
+
+@keyframes twinkle {
+
+    0%,100% {
+        opacity: .25;
+        transform: scale(.8);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+
+}
+
+/* =========================================================
+   CLOUDS
+========================================================= */
+
+.cloud {
+
+    position: absolute;
+
+    height: 38px;
+
+    width: 125px;
+
+    background: rgba(255,255,255,.84);
+
+    border-radius: 40px;
+
+    opacity: .85;
+
+    transition:
+        opacity 2s ease;
+
+}
+
+.cloud::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 55px;
+    height: 55px;
+
+    left: 15px;
+    bottom: 7px;
+
+    background: inherit;
+
+    border-radius: 50%;
+
+}
+
+.cloud::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 68px;
+    height: 68px;
+
+    right: 12px;
+    bottom: 5px;
+
+    background: inherit;
+
+    border-radius: 50%;
+
+}
+
+.world.night .cloud {
+
+    opacity: .18;
+
+}
+
+/* =========================================================
+   RAIN
+========================================================= */
+
+.rain {
+
+    position: absolute;
+
+    inset: 0;
+
+    pointer-events: none;
+
+    opacity: 0;
+
+    transition: opacity 1s ease;
+
+}
+
+.rain.active {
+
+    opacity: 1;
+
+}
+
+.raindrop {
+
+    position: absolute;
+
+    width: 2px;
+
+    height: 20px;
+
+    border-radius: 4px;
+
+    background: rgba(180,220,255,.7);
+
+    animation: rainFall 1.2s linear infinite;
+
+}
+
+@keyframes rainFall {
+
+    from {
+        transform: translateY(-30px);
+    }
+
+    to {
+        transform: translateY(110vh);
+    }
+
+}
+
+/* =========================================================
+   GROUND
+========================================================= */
+
+.ground {
+
+    position: absolute;
+
+    left: -5%;
+
+    bottom: -8%;
+
+    width: 110%;
+
+    height: 49%;
+
+    background:
+
+        radial-gradient(
+            ellipse at 20% 20%,
+            rgba(255,255,255,.12),
+            transparent 35%
+        ),
+
+        linear-gradient(
+            to bottom,
+            #82ce73,
+            #57a951
+        );
+
+    border-radius:
+        50% 50% 0 0 /
+        15% 15% 0 0;
+
+    transition:
+        background 2s ease;
+
+}
+
+.world.night .ground {
+
+    background:
+
+        radial-gradient(
+            ellipse at 20% 20%,
+            rgba(255,255,255,.04),
+            transparent 35%
+        ),
+
+        linear-gradient(
+            to bottom,
+            #477c4b,
+            #315d3b
+        );
+
+}
+
+/* =========================================================
+   RIVER
+========================================================= */
+
+.river {
+
+    position: absolute;
+
+    left: 0;
+
+    bottom: 0;
+
+    width: 100%;
+
+    height: 95px;
+
+    background:
+
+        linear-gradient(
+            180deg,
+            #6fc7dc,
+            #4ca7c4
+        );
+
+    border-radius:
+        50% 50% 0 0;
+
+    transform:
+        translateY(110px);
+
+    opacity: 0;
+
+    transition:
+        transform 1.5s ease,
+        opacity 1.5s ease;
+
+    overflow: hidden;
+
+}
+
+.river.visible {
+
+    transform: translateY(0);
+
+    opacity: 1;
+
+}
+
+.wave {
+
+    position: absolute;
+
+    width: 120px;
+
+    height: 10px;
+
+    border-top:
+        3px solid rgba(255,255,255,.45);
+
+    border-radius: 50%;
+
+    animation: waveMove 5s linear infinite;
+
+}
+
+@keyframes waveMove {
+
+    from {
+        transform: translateX(-150px);
+    }
+
+    to {
+        transform: translateX(110vw);
+    }
+
+}
+
+/* =========================================================
+   GARDEN OBJECT LAYER
+========================================================= */
+
+.objects {
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 10;
+
+    pointer-events: none;
+
+}
+
+/* =========================================================
+   OBJECT BASE
+========================================================= */
+
+.object {
+
+    position: absolute;
+
+    user-select: none;
+
+    animation:
+        objectAppear 1.2s cubic-bezier(.2,.8,.2,1);
+
+    transform-origin:
+        center bottom;
+
+    filter:
+        drop-shadow(
+            0 4px 3px rgba(0,0,0,.12)
+        );
+
+}
+
+@keyframes objectAppear {
+
+    0% {
+        opacity: 0;
+        transform:
+            scale(.2)
+            translateY(30px);
+    }
+
+    70% {
+        opacity: 1;
+        transform:
+            scale(1.08)
+            translateY(-3px);
+    }
+
+    100% {
+        opacity: 1;
+        transform:
+            scale(1)
+            translateY(0);
+    }
+
+}
+
+/* =========================================================
+   FLOWER
+========================================================= */
+
+.flower {
+
+    font-size:
+        var(--size);
+
+    bottom:
+        var(--bottom);
+
+    left:
+        var(--left);
+
+}
+
+/* =========================================================
+   TREE
+========================================================= */
+
+.tree {
+
+    font-size:
+        var(--size);
+
+    bottom:
+        var(--bottom);
+
+    left:
+        var(--left);
+
+}
+
+/* =========================================================
+   HOUSE
+========================================================= */
+
+.house {
+
+    font-size:
+        var(--size);
+
+    bottom:
+        var(--bottom);
+
+    left:
+        var(--left);
+
+    animation-duration: 1.8s;
+
+}
+
+/* =========================================================
+   BUTTERFLY
+========================================================= */
+
+.butterfly {
+
+    font-size:
+        var(--size);
+
+    left:
+        var(--left);
+
+    top:
+        var(--top);
+
+    animation:
+        objectAppear 1s ease,
+        butterflyFloat 7s ease-in-out infinite;
+
+}
+
+@keyframes butterflyFloat {
+
+    0%,100% {
+        margin-top: 0;
+        margin-left: 0;
+    }
+
+    50% {
+        margin-top: -35px;
+        margin-left: 35px;
+    }
+
+}
+
+/* =========================================================
+   BIRD
+========================================================= */
+
+.bird {
+
+    font-size:
+        var(--size);
+
+    top:
+        var(--top);
+
+    left:
+        -15%;
+
+    animation:
+        birdFly 9s linear forwards;
+
+}
+
+@keyframes birdFly {
+
+    from {
+        left: -15%;
+    }
+
+    to {
+        left: 115%;
+    }
+
+}
+
+/* =========================================================
+   BOAT
+========================================================= */
+
+.boat {
+
+    position: absolute;
+
+    bottom: 20px;
+
+    left: -15%;
+
+    font-size:
+        var(--size);
+
+    animation:
+        boatMove 13s linear forwards;
+
+}
+
+@keyframes boatMove {
+
+    from {
+        left: -15%;
+    }
+
+    to {
+        left: 110%;
+    }
+
+}
+
+/* =========================================================
+   UI PANEL
+========================================================= */
+
+.interface {
+
+    position: relative;
+
+    z-index: 100;
+
+    width: 100%;
+
+    padding:
+        20px 16px 18px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+}
+
+/* =========================================================
+   TITLE
+========================================================= */
+
+.title {
+
+    color: #245a48;
+
+    font-size:
+        clamp(
+            30px,
+            8vw,
+            48px
+        );
+
+    font-weight: 700;
+
+    letter-spacing: -.5px;
+
+    text-shadow:
+        0 2px 2px rgba(255,255,255,.6);
+
+}
+
+.world.night .title {
+
+    color: #e7f0e5;
+
+}
+
+.subtitle {
+
+    margin-top: 4px;
+
+    color: #356451;
+
+    font-size: 16px;
+
+}
+
+.world.night .subtitle {
+
+    color: #c8d9d0;
+
+}
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+.message {
+
+    margin-top: 12px;
+
+    width:
+        min(
+            92%,
+            520px
+        );
+
+    min-height: 54px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    text-align: center;
+
+    padding:
+        10px 18px;
+
+    border-radius: 28px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            .88
+        );
+
+    color: #315d4a;
+
+    font-size: 16px;
+
+    box-shadow:
+        0 7px 25px
+        rgba(30,80,70,.12);
+
+    backdrop-filter:
+        blur(8px);
+
+}
+
+.world.night .message {
+
+    background:
+        rgba(
+            27,
+            43,
+            70,
+            .85
+        );
+
+    color: #e1ece7;
+
+}
+
+/* =========================================================
+   START PANEL
+========================================================= */
+
+.startPanel {
+
+    position: absolute;
+
+    z-index: 300;
+
+    left: 50%;
+    top: 50%;
+
+    transform:
+        translate(-50%,-50%);
+
+    width:
+        min(
+            90%,
+            430px
+        );
+
+    padding: 28px 22px;
+
+    border-radius: 30px;
+
+    text-align: center;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            .94
+        );
+
+    box-shadow:
+        0 20px 60px
+        rgba(30,80,70,.2);
+
+    transition:
+        opacity .6s ease,
+        transform .6s ease;
+
+}
+
+.startPanel.hidden {
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    transform:
+        translate(-50%,-50%)
+        scale(.95);
+
+}
+
+.startIcon {
+
+    font-size: 64px;
+
+    margin-bottom: 10px;
+
+}
+
+.startPanel h2 {
+
+    color: #315d4a;
+
+    font-size: 27px;
+
+}
+
+.startPanel p {
+
+    margin-top: 10px;
+
+    color: #628074;
+
+    line-height: 1.5;
+
+}
+
+.startButton {
+
+    margin-top: 20px;
+
+    width: 100%;
+
+    min-height: 58px;
+
+    border: none;
+
+    border-radius: 30px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #79cfa7,
+            #63b997
+        );
+
+    color: white;
+
+    font-size: 18px;
+
+    font-weight: 700;
+
+    box-shadow:
+        0 7px 18px
+        rgba(70,150,120,.25);
+
+}
+
+/* =========================================================
+   CONTROLS
+========================================================= */
+
+.controls {
+
+    position: absolute;
+
+    z-index: 200;
+
+    left: 50%;
+
+    bottom: 15px;
+
+    transform:
+        translateX(-50%);
+
+    width:
+        min(
+            94%,
+            520px
+        );
+
+    display: flex;
+
+    gap: 10px;
+
+}
+
+.controlButton {
+
+    min-height: 55px;
+
+    border: none;
+
+    border-radius: 28px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            .93
+        );
+
+    color: #315d4a;
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    box-shadow:
+        0 6px 18px
+        rgba(30,70,60,.14);
+
+}
+
+.voice {
+
+    flex: 1;
+
+}
+
+.reset {
+
+    width: 100px;
+
+}
+
+.voice.listening {
+
+    background: #ffe59b;
+
+    animation:
+        listeningPulse 1.5s
+        infinite;
+
+}
+
+@keyframes listeningPulse {
+
+    0% {
+        box-shadow:
+            0 0 0 0
+            rgba(255,220,120,.65);
+    }
+
+    70% {
+        box-shadow:
+            0 0 0 14px
+            rgba(255,220,120,0);
+    }
+
+    100% {
+        box-shadow:
+            0 0 0 0
+            rgba(255,220,120,0);
+    }
+
+}
+
+/* =========================================================
+   COMMAND HINT
+========================================================= */
+
+.commandHint {
+
+    position: absolute;
+
+    z-index: 150;
+
+    left: 50%;
+
+    bottom: 80px;
+
+    transform:
+        translateX(-50%);
+
+    width:
+        min(
+            92%,
+            600px
+        );
+
+    text-align: center;
+
+    color: rgba(255,255,255,.95);
+
+    font-size: 14px;
+
+    text-shadow:
+        0 1px 3px
+        rgba(0,0,0,.3);
+
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:500px) {
+
+    .sun {
+        width: 70px;
+        height: 70px;
+    }
+
+    .moon {
+        width: 62px;
+        height: 62px;
+    }
+
+    .moon::after {
+        width: 62px;
+        height: 62px;
+    }
+
+    .title {
+        font-size: 31px;
+    }
+
+    .subtitle {
+        font-size: 14px;
+    }
+
+    .message {
+        font-size: 15px;
+    }
+
+    .controls {
+        bottom: 10px;
+    }
+
+    .controlButton {
+        min-height: 52px;
+        font-size: 14px;
+    }
+
+    .reset {
+        width: 86px;
+    }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+<div class="world" id="world">
+
+    <!-- =================================================
+         SKY
+    ================================================== -->
+
+    <div class="sky">
+
+        <div class="sun" id="sun"></div>
+
+        <div class="moon" id="moon"></div>
+
+        <div class="stars" id="stars"></div>
+
+        <div class="cloud"
+             style="left:8%;top:20%;"></div>
+
+        <div class="cloud"
+             style="left:58%;top:31%;transform:scale(.75);"></div>
+
+        <div class="rain"
+             id="rain"></div>
+
+    </div>
+
+
+    <!-- =================================================
+         GROUND
+    ================================================== -->
+
+    <div class="ground"></div>
+
+    <div class="river"
+         id="river"></div>
+
+
+    <!-- =================================================
+         OBJECTS
+    ================================================== -->
+
+    <div class="objects"
+         id="objects"></div>
+
+
+    <!-- =================================================
+         MAIN UI
+    ================================================== -->
+
+    <div class="interface">
+
+        <div class="title">
+            🌿 Whispering Garden
+        </div>
+
+        <div class="subtitle">
+            Speak softly and let your world grow
+        </div>
+
+        <div class="message"
+             id="message">
+
+            Your garden is waiting for you 🌱
+
+        </div>
+
+    </div>
+
+
+    <!-- =================================================
+         COMMAND HINT
+    ================================================== -->
+
+    <div class="commandHint">
+
+        Try saying:
+        “flower” · “tree” · “house” · “butterfly” ·
+        “bird” · “river” · “boat” · “rain” · “sun” · “moon”
+
+    </div>
+
+
+    <!-- =================================================
+         CONTROLS
+    ================================================== -->
+
+    <div class="controls">
+
+        <button
+            type="button"
+            class="controlButton voice"
+            id="voiceButton">
+
+            🎤 Start Listening
+
+        </button>
+
+        <button
+            type="button"
+            class="controlButton reset"
+            id="resetButton">
+
+            🌱 Reset
+
+        </button>
+
+    </div>
+
+
+    <!-- =================================================
+         START
+    ================================================== -->
+
+    <div class="startPanel"
+         id="startPanel">
+
+        <div class="startIcon">
+            🌿
+        </div>
+
+        <h2>
+            Welcome to your garden
+        </h2>
+
+        <p>
+            Take your time.<br>
+            Speak whenever you feel like it.<br>
+            There is nothing to win or lose.
+        </p>
+
+        <button
+            type="button"
+            class="startButton"
+            id="startButton">
+
+            🌸 Begin the Garden
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+
+"use strict";
+
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
+
+const world =
+    document.getElementById("world");
+
+const objects =
+    document.getElementById("objects");
+
+const message =
+    document.getElementById("message");
+
+const voiceButton =
+    document.getElementById("voiceButton");
+
+const resetButton =
+    document.getElementById("resetButton");
+
+const startPanel =
+    document.getElementById("startPanel");
+
+const startButton =
+    document.getElementById("startButton");
+
+const sun =
+    document.getElementById("sun");
+
+const moon =
+    document.getElementById("moon");
+
+const stars =
+    document.getElementById("stars");
+
+const rain =
+    document.getElementById("rain");
+
+const river =
+    document.getElementById("river");
+
+
+/* =========================================================
+   SPEECH
+========================================================= */
+
+const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+let recognition = null;
+
+let listening = false;
+
+
+/* =========================================================
+   AUDIO
+========================================================= */
+
+let audioContext = null;
+
+let ambientGain = null;
+
+let ambientStarted = false;
+
+
+/* =========================================================
+   COUNTERS
+========================================================= */
+
+let flowerCount = 0;
+let treeCount = 0;
+let houseCount = 0;
+let butterflyCount = 0;
+let birdCount = 0;
+let cloudCount = 0;
+let boatCount = 0;
+let riverVisible = false;
+
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+function say(text) {
+
+    message.textContent = text;
+
+}
+
+
+/* =========================================================
+   RANDOM
+========================================================= */
+
+function random(min,max) {
+
+    return Math.random() *
+        (max-min) + min;
+
+}
+
+
+/* =========================================================
+   AUDIO INITIALIZATION
+========================================================= */
+
+function initAudio() {
+
+    if (audioContext) {
+
+        if (
+            audioContext.state ===
+            "suspended"
+        ) {
+
+            audioContext.resume();
+
+        }
+
+        return;
+
+    }
+
+    const AudioCtx =
+        window.AudioContext ||
+        window.webkitAudioContext;
+
+    if (!AudioCtx) {
+
+        return;
+
+    }
+
+    audioContext =
+        new AudioCtx();
+
+
+    ambientGain =
+        audioContext.createGain();
+
+    ambientGain.gain.value =
+        0.025;
+
+    ambientGain.connect(
+        audioContext.destination
+    );
+
+}
+
+
+/* =========================================================
+   GENTLE TONE
+========================================================= */
+
+function tone(
+    frequency,
+    duration = .6,
+    volume = .08,
+    type = "sine"
+) {
+
+    if (!audioContext) {
+
+        return;
+
+    }
+
+    const oscillator =
+        audioContext.createOscillator();
+
+    const gain =
+        audioContext.createGain();
+
+    oscillator.type = type;
+
+    oscillator.frequency.setValueAtTime(
+        frequency,
+        audioContext.currentTime
+    );
+
+    gain.gain.setValueAtTime(
+        0,
+        audioContext.currentTime
+    );
+
+    gain.gain.linearRampToValueAtTime(
+        volume,
+        audioContext.currentTime + .05
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+        .001,
+        audioContext.currentTime + duration
+    );
+
+    oscillator.connect(gain);
+
+    gain.connect(
+        audioContext.destination
+    );
+
+    oscillator.start();
+
+    oscillator.stop(
+        audioContext.currentTime + duration
+    );
+
+}
+
+
+/* =========================================================
+   UNIQUE OBJECT SOUNDS
+========================================================= */
+
+function soundFlower() {
+
+    tone(523.25,.8,.07,"sine");
+
+    setTimeout(
+        () => tone(659.25,.9,.055,"sine"),
+        120
+    );
+
+}
+
+
+function soundTree() {
+
+    tone(261.63,1.1,.06,"sine");
+
+    setTimeout(
+        () => tone(329.63,1.2,.045,"sine"),
+        160
+    );
+
+}
+
+
+function soundHouse() {
+
+    tone(392,.55,.065,"triangle");
+
+    setTimeout(
+        () => tone(523.25,.8,.05,"triangle"),
+        150
+    );
+
+}
+
+
+function soundButterfly() {
+
+    tone(659.25,.35,.045,"sine");
+
+    setTimeout(
+        () => tone(783.99,.55,.04,"sine"),
+        130
+    );
+
+}
+
+
+function soundBird() {
+
+    tone(880,.25,.045,"sine");
+
+    setTimeout(
+        () => tone(1174.66,.4,.035,"sine"),
+        180
+    );
+
+}
+
+
+function soundCloud() {
+
+    tone(349.23,1.1,.035,"sine");
+
+}
+
+
+function soundRain() {
+
+    for (
+        let i = 0;
+        i < 4;
+        i++
+    ) {
+
+        setTimeout(
+            () => tone(
+                500 + Math.random()*300,
+                .7,
+                .018,
+                "sine"
+            ),
+            i * 180
+        );
+
+    }
+
+}
+
+
+function soundRiver() {
+
+    tone(293.66,1.3,.035,"sine");
+
+    setTimeout(
+        () => tone(369.99,1.5,.025,"sine"),
+        300
+    );
+
+}
+
+
+function soundBoat() {
+
+    tone(196,.7,.045,"triangle");
+
+    setTimeout(
+        () => tone(261.63,.9,.035,"triangle"),
+        200
+    );
+
+}
+
+
+/* =========================================================
+   AMBIENT MUSIC
+========================================================= */
+
+function startAmbient() {
+
+    if (
+        ambientStarted ||
+        !audioContext
+    ) {
+
+        return;
+
+    }
+
+    ambientStarted = true;
+
+
+    const notes = [
+        261.63,
+        329.63,
+        392.00,
+        329.63
+    ];
+
+
+    let index = 0;
+
+
+    function playAmbientNote() {
+
+        if (!audioContext) {
+
+            return;
+
+        }
+
+        const osc =
+            audioContext.createOscillator();
+
+        const gain =
+            audioContext.createGain();
+
+        osc.type = "sine";
+
+        osc.frequency.value =
+            notes[index];
+
+        gain.gain.setValueAtTime(
+            0,
+            audioContext.currentTime
+        );
+
+        gain.gain.linearRampToValueAtTime(
+            .025,
+            audioContext.currentTime + 1
+        );
+
+        gain.gain.linearRampToValueAtTime(
+            .001,
+            audioContext.currentTime + 4
+        );
+
+        osc.connect(gain);
+
+        gain.connect(ambientGain);
+
+        osc.start();
+
+        osc.stop(
+            audioContext.currentTime + 4
+        );
+
+        index =
+            (index + 1) %
+            notes.length;
+
+        setTimeout(
+            playAmbientNote,
+            3800
+        );
+
+    }
+
+
+    playAmbientNote();
+
+}
+
+
+/* =========================================================
+   STARS
+========================================================= */
+
+function createStars() {
+
+    stars.innerHTML = "";
+
+    for (
+        let i = 0;
+        i < 35;
+        i++
+    ) {
+
+        const star =
+            document.createElement("div");
+
+        star.className =
+            "star";
+
+        star.textContent =
+            "✦";
+
+        star.style.left =
+            random(2,98) + "%";
+
+        star.style.top =
+            random(5,48) + "%";
+
+        star.style.animationDelay =
+            random(0,3) + "s";
+
+        stars.appendChild(star);
+
+    }
+
+}
+
+
+/* =========================================================
+   DAY / NIGHT
+========================================================= */
+
+function setDay() {
+
+    world.classList.remove(
+        "night"
+    );
+
+    sun.style.opacity = "1";
+
+    sun.style.transform =
+        "scale(1)";
+
+    moon.style.opacity = "0";
+
+    moon.style.transform =
+        "scale(.7)";
+
+    say(
+        "Warm sunshine is filling your garden ☀️"
+    );
+
+}
+
+
+function setNight() {
+
+    world.classList.add(
+        "night"
+    );
+
+    sun.style.opacity = "0";
+
+    sun.style.transform =
+        "scale(.7)";
+
+    moon.style.opacity = "1";
+
+    moon.style.transform =
+        "scale(1)";
+
+    say(
+        "The moon is watching over your peaceful garden 🌙"
+    );
+
+}
+
+
+/* =========================================================
+   FLOWER
+========================================================= */
+
+function addFlower() {
+
+    const flower =
+        document.createElement("div");
+
+    flower.className =
+        "object flower";
+
+    const flowers = [
+        "🌷",
+        "🌸",
+        "🌻",
+        "🌼",
+        "🌹",
+        "🌺"
+    ];
+
+    flower.textContent =
+        flowers[
+            Math.floor(
+                Math.random() *
+                flowers.length
+            )
+        ];
+
+    flower.style.setProperty(
+        "--size",
+        random(30,65) + "px"
+    );
+
+    flower.style.setProperty(
+        "--left",
+        random(5,90) + "%"
+    );
+
+    flower.style.setProperty(
+        "--bottom",
+        random(12,30) + "%"
+    );
+
+    objects.appendChild(
+        flower
+    );
+
+    flowerCount++;
+
+    soundFlower();
+
+    say(
+        "A lovely flower has bloomed 🌸"
+    );
+
+}
+
+
+/* =========================================================
+   TREE
+========================================================= */
+
+function addTree() {
+
+    const tree =
+        document.createElement("div");
+
+    tree.className =
+        "object tree";
+
+    tree.textContent =
+        Math.random() > .5
+        ? "🌳"
+        : "🌲";
+
+    tree.style.setProperty(
+        "--size",
+        random(75,145) + "px"
+    );
+
+    tree.style.setProperty(
+        "--left",
+        random(2,82) + "%"
+    );
+
+    tree.style.setProperty(
+        "--bottom",
+        random(12,18) + "%"
+    );
+
+    objects.appendChild(
+        tree
+    );
+
+    treeCount++;
+
+    soundTree();
+
+    say(
+        "A peaceful tree has grown 🌳"
+    );
+
+}
+
+
+/* =========================================================
+   HOUSE
+========================================================= */
+
+function addHouse() {
+
+    const house =
+        document.createElement("div");
+
+    house.className =
+        "object house";
+
+    house.textContent =
+        Math.random() > .5
+        ? "🏡"
+        : "🏠";
+
+    house.style.setProperty(
+        "--size",
+        random(75,135) + "px"
+    );
+
+    house.style.setProperty(
+        "--left",
+        random(15,75) + "%"
+    );
+
+    house.style.setProperty(
+        "--bottom",
+        random(12,19) + "%"
+    );
+
+    objects.appendChild(
+        house
+    );
+
+    houseCount++;
+
+    soundHouse();
+
+    say(
+        "A cozy little home has appeared 🏡"
+    );
+
+}
+
+
+/* =========================================================
+   BUTTERFLY
+========================================================= */
+
+function addButterfly() {
+
+    const butterfly =
+        document.createElement("div");
+
+    butterfly.className =
+        "object butterfly";
+
+    butterfly.textContent =
+        "🦋";
+
+    butterfly.style.setProperty(
+        "--size",
+        random(25,52) + "px"
+    );
+
+    butterfly.style.setProperty(
+        "--left",
+        random(10,80) + "%"
+    );
+
+    butterfly.style.setProperty(
+        "--top",
+        random(35,65) + "%"
+    );
+
+    objects.appendChild(
+        butterfly
+    );
+
+    butterflyCount++;
+
+    soundButterfly();
+
+    say(
+        "A butterfly is gently floating by 🦋"
+    );
+
+}
+
+
+/* =========================================================
+   BIRD
+========================================================= */
+
+function addBird() {
+
+    const bird =
+        document.createElement("div");
+
+    bird.className =
+        "object bird";
+
+    bird.textContent =
+        Math.random() > .5
+        ? "🐦"
+        : "🕊️";
+
+    bird.style.setProperty(
+        "--size",
+        random(25,50) + "px"
+    );
+
+    bird.style.setProperty(
+        "--top",
+        random(15,35) + "%"
+    );
+
+    objects.appendChild(
+        bird
+    );
+
+    birdCount++;
+
+    soundBird();
+
+    say(
+        "A little bird is flying peacefully across the sky 🐦"
+    );
+
+    setTimeout(
+        () => bird.remove(),
+        9500
+    );
+
+}
+
+
+/* =========================================================
+   CLOUD
+========================================================= */
+
+function addCloud() {
+
+    const cloud =
+        document.createElement("div");
+
+    cloud.className =
+        "cloud object";
+
+    cloud.style.width =
+        random(90,170) + "px";
+
+    cloud.style.height =
+        random(28,48) + "px";
+
+    cloud.style.left =
+        random(5,75) + "%";
+
+    cloud.style.top =
+        random(15,40) + "%";
+
+    document
+        .querySelector(".sky")
+        .appendChild(cloud);
+
+    cloudCount++;
+
+    soundCloud();
+
+    say(
+        "A soft cloud is floating through the sky ☁️"
+    );
+
+}
+
+
+/* =========================================================
+   RAIN
+========================================================= */
+
+function addRain() {
+
+    rain.innerHTML = "";
+
+    rain.classList.add(
+        "active"
+    );
+
+    for (
+        let i = 0;
+        i < 65;
+        i++
+    ) {
+
+        const drop =
+            document.createElement("div");
+
+        drop.className =
+            "raindrop";
+
+        drop.style.left =
+            random(0,100) + "%";
+
+        drop.style.animationDelay =
+            random(0,1.5) + "s";
+
+        rain.appendChild(
+            drop
+        );
+
+    }
+
+    soundRain();
+
+    say(
+        "Gentle rain is falling over the garden 🌧️"
+    );
+
+    setTimeout(
+        () => rain.classList.remove("active"),
+        10000
+    );
+
+}
+
+
+/* =========================================================
+   RIVER
+========================================================= */
+
+function addRiver() {
+
+    if (riverVisible) {
+
+        soundRiver();
+
+        say(
+            "The river continues to flow peacefully 🌊"
+        );
+
+        return;
+
+    }
+
+    riverVisible = true;
+
+    river.classList.add(
+        "visible"
+    );
+
+    for (
+        let i = 0;
+        i < 7;
+        i++
+    ) {
+
+        const wave =
+            document.createElement("div");
+
+        wave.className =
+            "wave";
+
+        wave.style.top =
+            random(15,80) + "%";
+
+        wave.style.left =
+            random(0,100) + "%";
+
+        wave.style.animationDelay =
+            random(0,4) + "s";
+
+        river.appendChild(
+            wave
+        );
+
+    }
+
+    soundRiver();
+
+    say(
+        "A peaceful river is flowing through your garden 🌊"
+    );
+
+}
+
+
+/* =========================================================
+   BOAT
+========================================================= */
+
+function addBoat() {
+
+    if (!riverVisible) {
+
+        addRiver();
+
+    }
+
+    const boat =
+        document.createElement("div");
+
+    boat.className =
+        "boat";
+
+    boat.textContent =
+        "🚤";
+
+    boat.style.setProperty(
+        "--size",
+        random(32,65) + "px"
+    );
+
+    river.appendChild(
+        boat
+    );
+
+    soundBoat();
+
+    say(
+        "A little boat is gently floating along the river 🚤"
+    );
+
+    setTimeout(
+        () => boat.remove(),
+        14000
+    );
+
+}
+
+
+/* =========================================================
+   COMMAND PROCESSING
+========================================================= */
+
+function processCommand(text) {
+
+    const command =
+        text
+            .toLowerCase()
+            .trim();
+
+
+    if (
+        command.includes("flower") ||
+        command.includes("flowers")
+    ) {
+
+        addFlower();
+
+        return;
+
+    }
+
+
+    if (
+        command.includes("tree") ||
+        command.includes("trees")
+    ) {
+
+        addTree();
+
+        return;
+
+    }
+
+
+    if (
+        command.includes("house") ||
+        command.includes("home")
+    ) {
+
+        addHouse();
+
+        return;
+
+    }
+
+
+    if (
+        command.includes("butterfly") ||
+        command.includes("butterflies")
+    ) {
+
+        addButterfly();
+
+        return;
+
+    }
+
+
+    if (
+        command.includes("bird") ||
+        command.includes("birds")
+    ) {
+
+        addBird();
+
+        return;
+
+    }
+
+
+    if (
+        command.includes("cloud") ||
+        command.includes("clouds")
+    ) {
+
+        addCloud();
+
+        return;
+
+    }
+
+
+    if (
+        command.includes("rain") ||
+        command.includes("rainy")
+    ) {
+
+        addRain();
+
+        return;
+
+    }
+
+
+    if (
+        command.includes("river") ||
+        command.includes("water")
+    ) {
+
+        addRiver();
+
+        return;
+
+    }
+
+
+    if (
+        command.includes("boat")
+    ) {
+
+        addBoat();
+
+        return;
+
+    }
+
+
+    if (
+        command.includes("moon") ||
+        command.includes("night")
+    ) {
+
+        setNight();
+
+        return;
+
+    }
+
+
+    if (
+        command.includes("sun") ||
+        command.includes("day")
+    ) {
+
+        setDay();
+
+        return;
+
+    }
+
+}
+
+
+/* =========================================================
+   SPEECH SETUP
+========================================================= */
+
+function setupSpeech() {
+
+    if (!SpeechRecognition) {
+
+        voiceButton.disabled =
+            true;
+
+        voiceButton.textContent =
+            "🎤 Voice unavailable";
+
+        say(
+            "Voice recognition is not available in this browser."
+        );
+
+        return;
+
+    }
+
+
+    recognition =
+        new SpeechRecognition();
+
+
+    recognition.lang =
+        "en-IN";
+
+
+    recognition.continuous =
+        false;
+
+
+    recognition.interimResults =
+        false;
+
+
+    recognition.maxAlternatives =
+        1;
+
+
+    recognition.onstart =
+        function () {
+
+            listening = true;
+
+            voiceButton.classList.add(
+                "listening"
+            );
+
+            voiceButton.textContent =
+                "🎤 Listening...";
+
+        };
+
+
+    recognition.onresult =
+        function(event) {
+
+            const result =
+                event.results[
+                    event.resultIndex
+                ];
+
+
+            if (!result) {
+
+                return;
+
+            }
+
+
+            const text =
+                result[0]
+                    .transcript
+                    .toLowerCase();
+
+
+            console.log(
+                "Recognized:",
+                text
+            );
+
+
+            processCommand(
+                text
+            );
+
+        };
+
+
+    recognition.onerror =
+        function(event) {
+
+            console.log(
+                "Speech recognition:",
+                event.error
+            );
+
+            listening = false;
+
+            voiceButton.classList.remove(
+                "listening"
+            );
+
+            voiceButton.textContent =
+                "🎤 Start Listening";
+
+        };
+
+
+    recognition.onend =
+        function() {
+
+            listening = false;
+
+            voiceButton.classList.remove(
+                "listening"
+            );
+
+            voiceButton.textContent =
+                "🎤 Start Listening";
+
+        };
+
+}
+
+
+/* =========================================================
+   VOICE BUTTON
+========================================================= */
+
+voiceButton.addEventListener(
+    "click",
+    function() {
+
+        initAudio();
+
+        startAmbient();
+
+
+        if (!recognition) {
+
+            return;
+
+        }
+
+
+        if (listening) {
+
+            recognition.stop();
+
+            return;
+
+        }
+
+
+        try {
+
+            recognition.start();
+
+        } catch(error) {
+
+            console.log(error);
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   START BUTTON
+========================================================= */
+
+startButton.addEventListener(
+    "click",
+    function() {
+
+        initAudio();
+
+        startAmbient();
+
+        startPanel.classList.add(
+            "hidden"
+        );
+
+        say(
+            "Your peaceful garden is ready 🌱"
+        );
+
+    }
+);
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+resetButton.addEventListener(
+    "click",
+    function() {
+
+        objects.innerHTML = "";
+
+        river.innerHTML = "";
+
+        river.classList.remove(
+            "visible"
+        );
+
+        rain.classList.remove(
+            "active"
+        );
+
+        rain.innerHTML = "";
+
+        flowerCount = 0;
+        treeCount = 0;
+        houseCount = 0;
+        butterflyCount = 0;
+        birdCount = 0;
+        cloudCount = 0;
+        boatCount = 0;
+
+        riverVisible = false;
+
+        setDay();
+
+        say(
+            "Your garden is ready to grow again 🌱"
+        );
+
+    }
+);
+
+
+/* =========================================================
+   INITIALIZE
+========================================================= */
+
+createStars();
+
+setupSpeech();
+
+
+/* =========================================================
+   INITIAL DAY
+========================================================= */
+
+setDay();
+
+</script>
+
+</body>
+</html>
+
